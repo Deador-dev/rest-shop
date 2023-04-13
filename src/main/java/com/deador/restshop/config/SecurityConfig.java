@@ -29,7 +29,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.httpBasic()
-                .disable().csrf().disable().cors()
                 .and()
                 .authorizeRequests()
                 .antMatchers("/", "/shop/**", "/register", "/search/**", "/activate/**").permitAll()
@@ -50,7 +49,9 @@ public class SecurityConfig {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 //                .logoutSuccessUrl("/login")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID")
+                .and()
+                .csrf().disable().cors();
 
         return http.build();
     }

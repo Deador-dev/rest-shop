@@ -68,5 +68,7 @@ public class User implements Convertible {
     public void preUpdate() {
         updateDate = LocalDateTime.now();
     }
-//    private RefreshToken refreshToken;
+
+    // TODO: 13.04.2023 need to create refreshToken
+    //    private RefreshToken refreshToken;
 }
