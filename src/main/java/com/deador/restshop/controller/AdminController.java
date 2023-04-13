@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ShopController {
-    @GetMapping("/shop")
+public class AdminController {
+    @GetMapping("/admin/hello")
     public ResponseEntity<String> viewHello() {
-        return new ResponseEntity<>("Test role user & admin", HttpStatus.OK);
+        return new ResponseEntity<>("Test role admin", HttpStatus.OK);
     }
 }
