@@ -1,9 +1,11 @@
 package com.deador.restshop.entity;
 
+import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -13,7 +15,7 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Table(name = "smartphones")
-public class Smartphone {
+public class Smartphone implements Convertible {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -89,20 +91,25 @@ public class Smartphone {
     private Double weight;
 
     @Column
+    @ColumnDefault(value = "false")
     private Boolean isPromotionActive;
 
     @Column
+    @ColumnDefault(value = "0")
     private Double priceBeforePromotion;
 
     @Column
+    @ColumnDefault(value = "0")
     private Double priceAfterPromotion;
 
     @Column
     private String description;
 
     @Column
+    @ColumnDefault(value = "empty")
     private String imageName;
 
     @Column
+    @ColumnDefault(value = "0")
     private Long countOfViews;
 }

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/shop")
+@RequestMapping("/admin")
 public class SmartphoneController {
     private final SmartphoneService smartphoneService;
 
@@ -14,6 +14,4 @@ public class SmartphoneController {
     public SmartphoneController(SmartphoneService smartphoneService) {
         this.smartphoneService = smartphoneService;
     }
-
-
 }
