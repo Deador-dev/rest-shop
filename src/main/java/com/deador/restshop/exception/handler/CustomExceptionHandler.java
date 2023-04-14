@@ -7,6 +7,7 @@ import com.deador.restshop.exception.IncorrectInputException;
 import com.deador.restshop.exception.NotExistException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         stringBuilder.setLength(stringBuilder.length() - 5);
 
         return buildExceptionBody(new BadRequestException(stringBuilder.toString()), status);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException exception,
+                                                        HttpHeaders headers,
+                                                        HttpStatus status,
+                                                        WebRequest request) {
+        // TODO: 14.04.2023 Create an appropriate error message for the BadRequestException thrown when an invalid value is used in a @PathVariable.
+        return buildExceptionBody(
+                new BadRequestException(String.format("Invalid value used in path variable: '%s'." +
+                        " Please ensure that the provided parameter is of the correct type and format.", exception.getValue())),
+                status);
     }
 
     private ResponseEntity<Object> buildExceptionBody(Exception exception, HttpStatus httpStatus) {

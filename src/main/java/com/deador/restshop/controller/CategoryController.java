@@ -2,7 +2,6 @@ package com.deador.restshop.controller;
 
 import com.deador.restshop.dto.category.CategoryProfile;
 import com.deador.restshop.dto.category.CategoryResponse;
-import com.deador.restshop.entity.Category;
 import com.deador.restshop.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,11 +28,22 @@ public class CategoryController {
 
     @GetMapping("/category/{id}")
     public ResponseEntity<CategoryResponse> getCategory(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategoryById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategoryResponseById(id));
     }
 
     @PostMapping("/category")
     public ResponseEntity<CategoryResponse> addCategory(@Valid @RequestBody CategoryProfile categoryProfile) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(categoryProfile));
+    }
+
+    @PutMapping("/category/{id}")
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id,
+                                                           @Valid @RequestBody CategoryProfile categoryProfile) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.updateCategory(id, categoryProfile));
+    }
+
+    @DeleteMapping("/category/{id}")
+    public ResponseEntity<CategoryResponse> deleteCategory(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.deleteCategoryById(id));
     }
 }
