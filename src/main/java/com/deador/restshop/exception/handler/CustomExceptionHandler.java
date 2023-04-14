@@ -87,6 +87,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(new BadRequestException(exception.getMessage()), status);
     }
 
+    // TODO: 14.04.2023 need create handler for NotBlank
+
     private ResponseEntity<Object> buildExceptionBody(Exception exception, HttpStatus httpStatus) {
         ExceptionResponse exceptionResponse = ExceptionResponse
                 .builder()

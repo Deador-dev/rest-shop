@@ -1,21 +1,27 @@
 package com.deador.restshop.dto.smartphone;
 
+import com.deador.restshop.dto.category.CategoryResponse;
 import com.deador.restshop.dto.marker.Convertible;
+import com.deador.restshop.entity.Category;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
 public class SmartphoneResponse implements Convertible {
     private Long id;
-    @NotBlank
+    //    @NotBlank
     private String name;
-    @NotBlank
-    private Long categoryId;
-    @NotBlank
-    @Min(1)
-    @Max(999999)
+
+    private CategoryResponse category;
     private Double price;
     private String brand;
     private String model;
@@ -36,15 +42,15 @@ public class SmartphoneResponse implements Convertible {
     private String connectivity;
     private String bluetooth;
     private String nfc;
-    @NotBlank
-    @Min(1)
-    @Max(999999)
+    //    @NotBlank
+//    @Min(1)
+//    @Max(999999)
     private Double weight;
     private Boolean isPromotionActive;
     private Double priceBeforePromotion;
     private Double priceAfterPromotion;
-    @NotBlank
-    @Size(min = 50, max = 1500, message = "Description should be between 50 and 1500 chars")
+    //    @NotBlank
+//    @Size(min = 50, max = 1500, message = "Description should be between 50 and 1500 chars")
     private String description;
     // FIXME: 14.04.2023 @Size?
     private String imageName;
