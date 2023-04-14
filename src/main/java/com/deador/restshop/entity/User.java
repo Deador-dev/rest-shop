@@ -1,4 +1,4 @@
-package com.deador.restshop.model;
+package com.deador.restshop.entity;
 
 import com.deador.restshop.dto.marker.Convertible;
 import com.fasterxml.jackson.annotation.JsonFormat;

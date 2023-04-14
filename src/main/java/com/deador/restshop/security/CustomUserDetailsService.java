@@ -2,7 +2,7 @@ package com.deador.restshop.security;
 
 
 import com.deador.restshop.exception.UserAuthenticationException;
-import com.deador.restshop.model.User;
+import com.deador.restshop.entity.User;
 import com.deador.restshop.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

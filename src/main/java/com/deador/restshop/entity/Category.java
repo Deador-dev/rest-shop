@@ -1,27 +1,24 @@
-package com.deador.restshop.model;
+package com.deador.restshop.entity;
 
+import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 @Entity
-@Table(name = "roles")
-public class Role {
+@Table(name = "categories")
+public class Category implements Convertible {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column
     private String name;
-
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users;
 }

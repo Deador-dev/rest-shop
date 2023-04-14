@@ -1,0 +1,39 @@
+package com.deador.restshop.controller;
+
+import com.deador.restshop.dto.category.CategoryProfile;
+import com.deador.restshop.dto.category.CategoryResponse;
+import com.deador.restshop.entity.Category;
+import com.deador.restshop.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/admin")
+public class CategoryController {
+    private final CategoryService categoryService;
+
+    @Autowired
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryResponse>> getCategories() {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getAllCategories());
+    }
+
+    @GetMapping("/category/{id}")
+    public ResponseEntity<CategoryResponse> getCategory(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getCategoryById(id));
+    }
+
+    @PostMapping("/category")
+    public ResponseEntity<CategoryResponse> addCategory(@Valid @RequestBody CategoryProfile categoryProfile) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.addCategory(categoryProfile));
+    }
+}
