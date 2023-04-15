@@ -18,7 +18,7 @@ public class SmartphoneProfile implements Convertible {
     private Long id;
 
     @NotBlank
-    @Size(min = 5, max = 100, message = "should be between 5 and 100 chars")
+    @Size(min = 2, max = 100, message = "should be between 2 and 100 chars")
     private String name;
 
     private Long categoryId;

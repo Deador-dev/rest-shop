@@ -46,6 +46,11 @@ public class CategoryServiceImpl implements CategoryService {
         return allCategoryResponses;
     }
 
+    public Category getCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id)));
+    }
+
     @Override
     public CategoryResponse getCategoryResponseById(Long id) {
         Category category = getCategoryById(id);
@@ -96,10 +101,5 @@ public class CategoryServiceImpl implements CategoryService {
 
         log.debug("category {} was successfully deleted", category);
         return dtoConverter.convertToDTO(category, CategoryResponse.class);
-    }
-
-    private Category getCategoryById(Long id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id)));
     }
 }

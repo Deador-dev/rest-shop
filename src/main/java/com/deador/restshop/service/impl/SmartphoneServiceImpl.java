@@ -3,17 +3,21 @@ package com.deador.restshop.service.impl;
 import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.smartphone.SmartphoneProfile;
 import com.deador.restshop.dto.smartphone.SmartphoneResponse;
+import com.deador.restshop.entity.Category;
 import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.exception.AlreadyExistException;
+import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
 import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,8 +26,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SmartphoneServiceImpl implements SmartphoneService {
     private static final String SMARTPHONE_NOT_FOUND_BY_ID = "Smartphone not found by id: %s";
-
     private static final String SMARTPHONE_ALREADY_EXIST_WITH_NAME = "Smartphone already exist with name: %s";
+    private static final String SMARTPHONE_DELETING_ERROR = "Can't delete smartphone cause of relationships";
     private final SmartphoneRepository smartphoneRepository;
     private final CategoryService categoryService;
     private final DTOConverter dtoConverter;
@@ -43,8 +47,13 @@ public class SmartphoneServiceImpl implements SmartphoneService {
                 .map(smartphone -> (SmartphoneResponse) dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class))
                 .collect(Collectors.toList());
 
-        log.debug("**/getting list of smartphones = " + smartphoneResponses);
+        log.debug("getting list of smartphones = " + smartphoneResponses);
         return smartphoneResponses;
+    }
+
+    public Smartphone getSmartphoneById(Long id) {
+        return smartphoneRepository.findById(id)
+                .orElseThrow(() -> new NotExistException(String.format(SMARTPHONE_NOT_FOUND_BY_ID, id)));
     }
 
     @Override
@@ -55,7 +64,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
 
-        log.debug("**/getting smartphone by id = " + smartphone);
+        log.debug("getting smartphone by id = " + smartphone);
 
         return smartphoneResponse;
     }
@@ -67,11 +76,46 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         }
 
         Smartphone smartphone = smartphoneRepository.save(dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class));
-        log.debug("**/adding new smartphone = " + smartphone);
+        log.debug("adding new smartphone = " + smartphone);
 
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
 
         return smartphoneResponse;
+    }
+
+    @Override
+    public SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile) {
+        if (!smartphoneRepository.existsById(id)) {
+            throw new NotExistException(String.format(SMARTPHONE_NOT_FOUND_BY_ID, id));
+        }
+
+        Category category = null;
+        if (smartphoneProfile.getCategoryId() != null) {
+            category = categoryService.getCategoryById(smartphoneProfile.getCategoryId());
+        }
+
+        Smartphone updatedSmartphone = dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class);
+        updatedSmartphone.setId(id);
+        updatedSmartphone.setCategory(category);
+
+        log.debug("updating smartphone by id {}", updatedSmartphone);
+        return dtoConverter.convertToDTO(smartphoneRepository.save(updatedSmartphone), SmartphoneResponse.class);
+    }
+
+    @Override
+    public SmartphoneResponse deleteSmartphoneById(Long id) {
+        Smartphone smartphone = getSmartphoneById(id);
+
+        try {
+            smartphoneRepository.deleteById(id);
+            // TODO: 15.04.2023 need to delete cartItem, orderItem, and images in future
+        } catch (DataAccessException | ValidationException exception) {
+            throw new DatabaseRepositoryException(SMARTPHONE_DELETING_ERROR);
+        }
+
+        log.debug("smartphone was successfully deleted = {}", smartphone);
+
+        return dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
     }
 }

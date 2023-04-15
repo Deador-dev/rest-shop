@@ -27,12 +27,23 @@ public class SmartphoneController {
     }
 
     @GetMapping("/smartphone/{id}")
-    public ResponseEntity<SmartphoneResponse> getSmartphone(@PathVariable Long id){
+    public ResponseEntity<SmartphoneResponse> getSmartphone(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getSmartphoneResponseById(id));
     }
 
     @PostMapping("/smartphone")
     public ResponseEntity<SmartphoneResponse> addSmartphone(@Valid @RequestBody SmartphoneProfile smartphoneProfile) {
         return ResponseEntity.status(HttpStatus.CREATED).body(smartphoneService.addSmartphone(smartphoneProfile));
+    }
+
+    @PutMapping("/smartphone/{id}")
+    public ResponseEntity<SmartphoneResponse> updateSmartphone(@PathVariable Long id,
+                                                               @Valid @RequestBody SmartphoneProfile smartphoneProfile) {
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.updateSmartphone(id, smartphoneProfile));
+    }
+
+    @DeleteMapping("/smartphone/{id}")
+    public ResponseEntity<SmartphoneResponse> deleteClub(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.deleteSmartphoneById(id));
     }
 }
