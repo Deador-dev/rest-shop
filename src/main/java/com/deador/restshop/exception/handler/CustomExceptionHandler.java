@@ -36,6 +36,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(exception, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(DatabaseRepositoryException.class)
+    public final ResponseEntity<Object> handleDatabaseRepositoryException(DatabaseRepositoryException exception){
+        return buildExceptionBody(exception, HttpStatus.BAD_GATEWAY);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
                                                                   HttpHeaders headers,

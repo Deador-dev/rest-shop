@@ -93,6 +93,9 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = getCategoryById(id);
 
         try {
+
+
+
             categoryRepository.deleteById(id);
             categoryRepository.flush();
         } catch (DataAccessException | ValidationException exception) {
