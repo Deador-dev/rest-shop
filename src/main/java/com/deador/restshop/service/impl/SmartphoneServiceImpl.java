@@ -58,7 +58,9 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
     @Override
     public List<Smartphone> getAllSmartphonesByCategoryId(Long id) {
-        // FIXME: 15.04.2023 what if category doesn't exist
+        if (!categoryRepository.existsById(id)) {
+            throw new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id));
+        }
         List<Smartphone> smartphones = smartphoneRepository.findAllByCategoryId(id);
 
         log.debug("getting list of smartphones = " + smartphones);

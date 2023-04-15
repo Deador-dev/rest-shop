@@ -43,7 +43,7 @@ public class SmartphoneController {
     }
 
     @DeleteMapping("/smartphone/{id}")
-    public ResponseEntity<SmartphoneResponse> deleteClub(@PathVariable Long id){
+    public ResponseEntity<SmartphoneResponse> deleteSmartphone(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.deleteSmartphoneById(id));
     }
 }
