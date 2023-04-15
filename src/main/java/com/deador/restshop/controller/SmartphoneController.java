@@ -23,7 +23,7 @@ public class SmartphoneController {
 
     @GetMapping("/smartphones")
     public ResponseEntity<List<SmartphoneResponse>> getSmartphones() {
-        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getAllSmartphones());
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getAllSmartphoneResponses());
     }
 
     @GetMapping("/smartphone/{id}")

@@ -8,6 +8,7 @@ import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.exception.AlreadyExistException;
 import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
+import com.deador.restshop.repository.CategoryRepository;
 import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
 import com.deador.restshop.service.SmartphoneService;
@@ -25,30 +26,43 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class SmartphoneServiceImpl implements SmartphoneService {
+    private static final String CATEGORY_NOT_FOUND_BY_ID = "Category not found by id: %s";
     private static final String SMARTPHONE_NOT_FOUND_BY_ID = "Smartphone not found by id: %s";
     private static final String SMARTPHONE_ALREADY_EXIST_WITH_NAME = "Smartphone already exist with name: %s";
     private static final String SMARTPHONE_DELETING_ERROR = "Can't delete smartphone cause of relationships";
+    private final CategoryRepository categoryRepository;
     private final SmartphoneRepository smartphoneRepository;
     private final CategoryService categoryService;
     private final DTOConverter dtoConverter;
 
     @Autowired
-    public SmartphoneServiceImpl(SmartphoneRepository smartphoneRepository,
+    public SmartphoneServiceImpl(CategoryRepository categoryRepository,
+                                 SmartphoneRepository smartphoneRepository,
                                  CategoryService categoryService,
                                  DTOConverter dtoConverter) {
+        this.categoryRepository = categoryRepository;
         this.smartphoneRepository = smartphoneRepository;
         this.categoryService = categoryService;
         this.dtoConverter = dtoConverter;
     }
 
     @Override
-    public List<SmartphoneResponse> getAllSmartphones() {
+    public List<SmartphoneResponse> getAllSmartphoneResponses() {
         List<SmartphoneResponse> smartphoneResponses = smartphoneRepository.findAll().stream()
                 .map(smartphone -> (SmartphoneResponse) dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class))
                 .collect(Collectors.toList());
 
         log.debug("getting list of smartphones = " + smartphoneResponses);
         return smartphoneResponses;
+    }
+
+    @Override
+    public List<Smartphone> getAllSmartphonesByCategoryId(Long id) {
+        // FIXME: 15.04.2023 what if category doesn't exist
+        List<Smartphone> smartphones = smartphoneRepository.findAllByCategoryId(id);
+
+        log.debug("getting list of smartphones = " + smartphones);
+        return smartphones;
     }
 
     public Smartphone getSmartphoneById(Long id) {
@@ -73,6 +87,8 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     public SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile) {
         if (smartphoneRepository.existsByName(smartphoneProfile.getName())) {
             throw new AlreadyExistException(String.format(SMARTPHONE_ALREADY_EXIST_WITH_NAME, smartphoneProfile.getName()));
+        } else if (!categoryRepository.existsById(smartphoneProfile.getCategoryId())) {
+            throw new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, smartphoneProfile.getCategoryId()));
         }
 
         Smartphone smartphone = smartphoneRepository.save(dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class));

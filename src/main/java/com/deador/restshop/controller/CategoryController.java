@@ -23,7 +23,7 @@ public class CategoryController {
 
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryResponse>> getCategories() {
-        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getAllCategories());
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getAllCategoryResponses());
     }
 
     @GetMapping("/category/{id}")
@@ -43,7 +43,8 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category/{id}")
-    public ResponseEntity<CategoryResponse> deleteCategory(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(categoryService.deleteCategoryById(id));
+    public ResponseEntity<CategoryResponse> deleteCategory(@PathVariable Long id,
+                                                           @RequestParam(required = false) Boolean shouldDeleteAssociatedSmartphones) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.deleteCategoryById(id, shouldDeleteAssociatedSmartphones));
     }
 }

@@ -7,7 +7,7 @@ import com.deador.restshop.entity.Category;
 import java.util.List;
 
 public interface CategoryService {
-    List<CategoryResponse> getAllCategories();
+    List<CategoryResponse> getAllCategoryResponses();
 
     Category getCategoryById(Long id);
 
@@ -17,5 +17,5 @@ public interface CategoryService {
 
     CategoryResponse updateCategory(Long id, CategoryProfile categoryProfile);
 
-    CategoryResponse deleteCategoryById(Long id);
+    CategoryResponse deleteCategoryById(Long id, Boolean shouldDeleteAssociatedSmartphones);
 }

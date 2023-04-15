@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface SmartphoneRepository extends JpaRepository<Smartphone, Long> {
     List<Smartphone> findAll();
 
+    List<Smartphone> findAllByCategoryId(Long id);
+
     Optional<Smartphone> findById(Long id);
 
     boolean existsById(Long id);

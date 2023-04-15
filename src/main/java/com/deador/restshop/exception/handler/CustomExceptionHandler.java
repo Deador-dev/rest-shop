@@ -37,8 +37,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(DatabaseRepositoryException.class)
-    public final ResponseEntity<Object> handleDatabaseRepositoryException(DatabaseRepositoryException exception){
+    public final ResponseEntity<Object> handleDatabaseRepositoryException(DatabaseRepositoryException exception) {
         return buildExceptionBody(exception, HttpStatus.BAD_GATEWAY);
+    }
+
+    @ExceptionHandler(OperationWasCanceledException.class)
+    public final ResponseEntity<Object> handleOperationWasCanceledException(OperationWasCanceledException exception) {
+        return buildExceptionBody(exception, HttpStatus.OK);
     }
 
     @Override
@@ -63,7 +68,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                                                         WebRequest request) {
         // TODO: 14.04.2023 Create an appropriate error message for the BadRequestException thrown when an invalid value is used in a @PathVariable.
         return buildExceptionBody(
-                new BadRequestException(String.format("Invalid value used in path variable: '%s'." +
+                new BadRequestException(String.format("Invalid value used in URL path: '%s'." +
                         " Please ensure that the provided parameter is of the correct type and format.", exception.getValue())),
                 status);
     }

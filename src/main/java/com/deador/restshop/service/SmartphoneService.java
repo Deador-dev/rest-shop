@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SmartphoneService {
-    List<SmartphoneResponse> getAllSmartphones();
+    List<SmartphoneResponse> getAllSmartphoneResponses();
+
+    List<Smartphone> getAllSmartphonesByCategoryId(Long id);
 
     Smartphone getSmartphoneById(Long id);
 

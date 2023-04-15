@@ -4,11 +4,15 @@ import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.category.CategoryProfile;
 import com.deador.restshop.dto.category.CategoryResponse;
 import com.deador.restshop.entity.Category;
+import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.exception.AlreadyExistException;
 import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
+import com.deador.restshop.exception.OperationWasCanceledException;
 import com.deador.restshop.repository.CategoryRepository;
+import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
+import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -27,22 +31,25 @@ public class CategoryServiceImpl implements CategoryService {
     private static final String CATEGORY_ALREADY_EXIST_WITH_NAME = "Category already exist with name: %s";
     private static final String CATEGORY_DELETING_ERROR = "Can't delete category cause of relationships";
     private final CategoryRepository categoryRepository;
+    private final SmartphoneRepository smartphoneRepository;
     private final DTOConverter dtoConverter;
 
     @Autowired
     public CategoryServiceImpl(CategoryRepository categoryRepository,
+                               SmartphoneRepository smartphoneRepository,
                                DTOConverter dtoConverter) {
         this.categoryRepository = categoryRepository;
+        this.smartphoneRepository = smartphoneRepository;
         this.dtoConverter = dtoConverter;
     }
 
     @Override
-    public List<CategoryResponse> getAllCategories() {
+    public List<CategoryResponse> getAllCategoryResponses() {
         List<CategoryResponse> allCategoryResponses = categoryRepository.findAll().stream()
                 .map(category -> (CategoryResponse) dtoConverter.convertToDTO(category, CategoryResponse.class))
                 .collect(Collectors.toList());
 
-        log.debug("**/getting list of categories = " + allCategoryResponses);
+        log.debug("getting list of categories = " + allCategoryResponses);
         return allCategoryResponses;
     }
 
@@ -55,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse getCategoryResponseById(Long id) {
         Category category = getCategoryById(id);
 
-        log.debug("**/getting category by id = " + category);
+        log.debug("getting category by id = " + category);
 
         return dtoConverter.convertToDTO(category, CategoryResponse.class);
     }
@@ -67,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         Category category = categoryRepository.save(dtoConverter.convertToEntity(categoryProfile, Category.class));
-        log.debug("**/adding new category = " + category);
+        log.debug("adding new category = " + category);
 
         return dtoConverter.convertToDTO(category, CategoryResponse.class);
     }
@@ -83,26 +90,38 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = dtoConverter.convertToEntity(categoryProfile, Category.class);
         category.setId(id);
 
-        log.debug("**/updating category by id = " + category);
+        log.debug("updating category by id = " + category);
 
         return dtoConverter.convertToDTO(categoryRepository.save(category), CategoryResponse.class);
     }
 
     @Override
-    public CategoryResponse deleteCategoryById(Long id) {
+    public CategoryResponse deleteCategoryById(Long id, Boolean shouldDeleteAssociatedSmartphones) {
         Category category = getCategoryById(id);
+        List<Smartphone> smartphonesByCategoryId = smartphoneRepository.findAllByCategoryId(id);
 
         try {
+            if (smartphonesByCategoryId.isEmpty()) {
+                categoryRepository.deleteById(id);
+                categoryRepository.flush();
+                log.debug("category {} was successfully deleted", category);
+                return dtoConverter.convertToDTO(category, CategoryResponse.class);
+            }
 
+            if (shouldDeleteAssociatedSmartphones != null && shouldDeleteAssociatedSmartphones) {
+                smartphonesByCategoryId.forEach(smartphone -> {
+                    smartphoneRepository.deleteById(smartphone.getId());
+                });
+                categoryRepository.deleteById(id);
+                categoryRepository.flush();
 
+                log.debug("category {} was successfully deleted", category);
+                return dtoConverter.convertToDTO(category, CategoryResponse.class);
+            }
 
-            categoryRepository.deleteById(id);
-            categoryRepository.flush();
+            throw new DatabaseRepositoryException(CATEGORY_DELETING_ERROR);
         } catch (DataAccessException | ValidationException exception) {
             throw new DatabaseRepositoryException(CATEGORY_DELETING_ERROR);
         }
-
-        log.debug("category {} was successfully deleted", category);
-        return dtoConverter.convertToDTO(category, CategoryResponse.class);
     }
 }
