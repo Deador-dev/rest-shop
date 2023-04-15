@@ -15,7 +15,7 @@ import javax.validation.constraints.*;
 @Builder
 public class SmartphoneResponse implements Convertible {
     private Long id;
-    @NotBlank(message = "name cannot be empty")
+    @NotBlank(message = "cannot be empty")
     @Size(min = 2, max = 100, message = "should be between 2 and 100 chars")
     private String name;
     private CategoryResponse category;
@@ -39,7 +39,7 @@ public class SmartphoneResponse implements Convertible {
     private String connectivity;
     private String bluetooth;
     private String nfc;
-    @NotNull(message = "weight cannot be null")
+    @NotNull(message = "cannot be null")
     @Min(1)
     @Max(999999)
     private Double weight;

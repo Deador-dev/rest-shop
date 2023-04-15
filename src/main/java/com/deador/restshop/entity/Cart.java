@@ -1,5 +1,6 @@
 package com.deador.restshop.entity;
 
+import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "carts")
-public class Cart {
+public class Cart implements Convertible {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
