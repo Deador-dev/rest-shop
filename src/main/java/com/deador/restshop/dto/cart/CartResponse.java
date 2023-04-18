@@ -1,6 +1,6 @@
 package com.deador.restshop.dto.cart;
 
-import com.deador.restshop.dto.UserResponse;
+import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
 import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;

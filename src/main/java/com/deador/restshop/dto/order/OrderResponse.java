@@ -1,6 +1,6 @@
 package com.deador.restshop.dto.order;
 
-import com.deador.restshop.dto.UserResponse;
+import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

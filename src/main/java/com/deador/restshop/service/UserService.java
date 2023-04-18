@@ -1,6 +1,7 @@
 package com.deador.restshop.service;
 
-import com.deador.restshop.dto.UserResponse;
+import com.deador.restshop.dto.user.UserProfile;
+import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.entity.User;
 
 import java.util.List;
@@ -13,4 +14,6 @@ public interface UserService {
     User getUserById(Long id);
 
     UserResponse getUserResponseById(Long id);
+
+    UserResponse registerUser(UserProfile userProfile);
 }

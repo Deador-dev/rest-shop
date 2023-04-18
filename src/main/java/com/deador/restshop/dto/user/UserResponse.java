@@ -1,4 +1,4 @@
-package com.deador.restshop.dto;
+package com.deador.restshop.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

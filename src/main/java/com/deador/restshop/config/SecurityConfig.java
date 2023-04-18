@@ -36,7 +36,7 @@ public class SecurityConfig {
         http.httpBasic()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/shop/**", "/register", "/search/**", "/activate/**").permitAll()
+                .antMatchers("/", "/shop/**", "/registration", "/search/**", "/activate/**").permitAll()
                 // TODO: 13.04.2023 .antMatchers(/swagger)
                 .antMatchers(HttpMethod.GET,"/users/**").hasRole("ADMIN")
                 .antMatchers("/admin/**").hasRole("ADMIN")
