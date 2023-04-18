@@ -9,6 +9,7 @@ import com.deador.restshop.exception.AlreadyExistException;
 import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.repository.RoleRepository;
 import com.deador.restshop.repository.UserRepository;
+import com.deador.restshop.service.CartService;
 import com.deador.restshop.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,16 +33,19 @@ public class UserServiceImpl implements UserService {
     private static final String ROLE_NOT_FOUND_BY_ROLE_NAME = "Role not found by role name: %s";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final CartService cartService;
     private final DTOConverter dtoConverter;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
+                           CartService cartService,
                            DTOConverter dtoConverter,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.cartService = cartService;
         this.dtoConverter = dtoConverter;
         this.passwordEncoder = passwordEncoder;
     }
@@ -112,6 +116,7 @@ public class UserServiceImpl implements UserService {
         // FIXME: 18.04.2023 need to set user.setStatus(false);
         user.setStatus(true);
         user = userRepository.save(user);
+        cartService.createCartForUser(user);
         log.debug("user {} was registered successfully", user);
         // TODO: 18.04.2023 need to create sendVerificationEmail with MailSend
 

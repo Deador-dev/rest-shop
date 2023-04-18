@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.List;
@@ -28,8 +29,10 @@ public class Cart implements Convertible {
     private List<CartItem> cartItems;
 
     @Column
+    @ColumnDefault(value = "0")
     private Integer quantity;
 
     @Column
+    @ColumnDefault(value = "0")
     private Double price;
 }
