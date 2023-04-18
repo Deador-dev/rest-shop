@@ -3,6 +3,7 @@ package com.deador.restshop.controller;
 import com.deador.restshop.dto.smartphone.SmartphoneProfile;
 import com.deador.restshop.dto.smartphone.SmartphoneResponse;
 import com.deador.restshop.service.SmartphoneService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@Slf4j
 public class SmartphoneController {
     private final SmartphoneService smartphoneService;
 

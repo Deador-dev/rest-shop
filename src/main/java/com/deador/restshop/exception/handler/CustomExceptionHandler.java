@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -44,6 +45,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(OperationWasCanceledException.class)
     public final ResponseEntity<Object> handleOperationWasCanceledException(OperationWasCanceledException exception) {
         return buildExceptionBody(exception, HttpStatus.OK);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public final ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException exception) {
+        return buildExceptionBody(exception, HttpStatus.FORBIDDEN);
     }
 
     @Override
@@ -96,6 +102,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                                                                           WebRequest request) {
         return buildExceptionBody(new BadRequestException(exception.getMessage()), status);
     }
+
+
 
     // TODO: 14.04.2023 need create handler for NotBlank
 

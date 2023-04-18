@@ -3,6 +3,7 @@ package com.deador.restshop.controller;
 import com.deador.restshop.dto.order.OrderProfile;
 import com.deador.restshop.dto.order.OrderResponse;
 import com.deador.restshop.service.OrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/admin")
+@Slf4j
 public class OrderController {
     private final OrderService orderService;
 
