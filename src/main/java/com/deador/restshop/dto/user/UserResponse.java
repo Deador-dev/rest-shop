@@ -1,5 +1,6 @@
 package com.deador.restshop.dto.user;
 
+import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Data
 @Builder
-public class UserResponse {
+public class UserResponse implements Convertible {
     private Long id;
 
     @NotBlank

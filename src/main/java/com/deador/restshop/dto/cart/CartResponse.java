@@ -3,6 +3,8 @@ package com.deador.restshop.dto.cart;
 import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
 import com.deador.restshop.dto.marker.Convertible;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +21,6 @@ import java.util.List;
 @Builder
 public class CartResponse implements Convertible {
     private Long id;
-
     private UserResponse user;
     private List<CartItemResponse> cartItems;
     @NotNull(message = "cannot be null")

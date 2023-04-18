@@ -69,13 +69,15 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
     public Smartphone getSmartphoneById(Long id) {
         return smartphoneRepository.findById(id)
-                .orElseThrow(() -> new NotExistException(String.format(SMARTPHONE_NOT_FOUND_BY_ID, id)));
+                .orElseThrow(() -> {
+                    log.error("smartphone not found by id {}", id);
+                    return new NotExistException(String.format(SMARTPHONE_NOT_FOUND_BY_ID, id));
+                });
     }
 
     @Override
     public SmartphoneResponse getSmartphoneResponseById(Long id) {
-        Smartphone smartphone = smartphoneRepository.findById(id)
-                .orElseThrow(() -> new NotExistException(String.format(SMARTPHONE_NOT_FOUND_BY_ID, id)));
+        Smartphone smartphone = getSmartphoneById(id);
 
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));

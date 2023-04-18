@@ -1,6 +1,7 @@
 package com.deador.restshop.entity;
 
 import com.deador.restshop.dto.marker.Convertible;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
