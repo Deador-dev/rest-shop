@@ -1,6 +1,7 @@
 package com.deador.restshop.controller;
 
 import com.deador.restshop.dto.cart.CartResponse;
+import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
 import com.deador.restshop.security.UserPrincipal;
 import com.deador.restshop.service.CartItemService;
 import com.deador.restshop.service.CartService;
@@ -34,9 +35,19 @@ public class CartController {
 
     @PreAuthorize("hasRole('ADMIN') or isAuthenticated()")
     @PostMapping("/cart/add-to-cart")
+    // FIXME: 18.04.2023 The user should only be able to delete smartphones from their own cart.
     public ResponseEntity<CartResponse> addSmartphoneToCart(@RequestParam Long smartphoneId,
                                                             @RequestParam Integer quantity,
                                                             @AuthenticationPrincipal UserPrincipal user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addSmartphoneToCart(user.getId(),  smartphoneId, quantity));
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addSmartphoneToCart(user.getId(), smartphoneId, quantity));
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or isAuthenticated()")
+    @DeleteMapping("/cart/delete-from-cart/{id}")
+    // FIXME: 18.04.2023 The user should only be able to delete smartphones from their own cart.
+    // FIXME: 18.04.2023 need to change ResponseEntity<CartItemResponse> -> ResponseEntity<CartResponse>
+    public ResponseEntity<CartItemResponse> deleteSmartphoneFromCart(@PathVariable(name = "id") Long cartItemId,
+                                                                     @AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.status(HttpStatus.OK).body(cartItemService.deleteSmartphoneFromCart(user.getId(), cartItemId));
     }
 }

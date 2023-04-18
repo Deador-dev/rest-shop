@@ -11,4 +11,6 @@ public interface CartItemService {
     List<CartItemResponse> getCartItemResponsesByCartResponse(CartResponse cartResponse);
 
     CartItemResponse addCartItem(Cart cart, Smartphone smartphone);
+
+    CartItemResponse deleteSmartphoneFromCart(Long userId, Long cartItemId);
 }

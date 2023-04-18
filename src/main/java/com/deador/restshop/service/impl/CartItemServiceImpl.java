@@ -6,14 +6,18 @@ import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
 import com.deador.restshop.entity.Cart;
 import com.deador.restshop.entity.CartItem;
 import com.deador.restshop.entity.Smartphone;
+import com.deador.restshop.exception.DatabaseRepositoryException;
+import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.factory.ObjectFactory;
 import com.deador.restshop.repository.CartItemRepository;
 import com.deador.restshop.service.CartItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ValidationException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +25,8 @@ import java.util.stream.Collectors;
 @Transactional
 @Slf4j
 public class CartItemServiceImpl implements CartItemService {
+    private static final String CART_ITEM_NOT_FOUND_BY_ID = "Cart item not found by id: %s";
+    private static final String CART_ITEM_DELETING_ERROR = "Can't delete cart item cause of relationships";
     private final CartItemRepository cartItemRepository;
     private final DTOConverter dtoConverter;
     private final ObjectFactory objectFactory;
@@ -51,5 +57,24 @@ public class CartItemServiceImpl implements CartItemService {
 
         log.debug("adding smartphone by id {} to cart", smartphone.getId());
         return dtoConverter.convertToDTO(cartItemRepository.save(cartItem), CartItemResponse.class);
+    }
+
+    @Override
+    public CartItemResponse deleteSmartphoneFromCart(Long userId, Long cartItemId) {
+        CartItem cartItem = cartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> {
+                    log.error("cart item not found by id {}", cartItemId);
+                    return new NotExistException(String.format(CART_ITEM_NOT_FOUND_BY_ID, cartItemId));
+                });
+
+        try {
+            cartItemRepository.deleteById(cartItemId);
+            cartItemRepository.flush();
+        } catch (DataAccessException | ValidationException exception) {
+            throw new DatabaseRepositoryException(CART_ITEM_DELETING_ERROR);
+        }
+
+        log.debug("cart item {} was successfully deleted", cartItem);
+        return dtoConverter.convertToDTO(cartItem, CartItemResponse.class);
     }
 }

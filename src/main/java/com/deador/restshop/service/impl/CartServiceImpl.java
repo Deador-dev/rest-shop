@@ -4,6 +4,7 @@ import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.cart.CartResponse;
 import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.entity.Cart;
+import com.deador.restshop.entity.CartItem;
 import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.entity.User;
 import com.deador.restshop.exception.NotExistException;
