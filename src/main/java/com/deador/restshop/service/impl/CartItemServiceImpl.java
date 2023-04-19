@@ -8,8 +8,10 @@ import com.deador.restshop.entity.CartItem;
 import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
+import com.deador.restshop.exception.UserAuthenticationException;
 import com.deador.restshop.factory.ObjectFactory;
 import com.deador.restshop.repository.CartItemRepository;
+import com.deador.restshop.security.UserPrincipal;
 import com.deador.restshop.service.CartItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,15 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
+    public CartItem getCartItemById(Long id) {
+        return cartItemRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("cart item not found by id {}", id);
+                    return new NotExistException(String.format(CART_ITEM_NOT_FOUND_BY_ID, id));
+                });
+    }
+
+    @Override
     public CartItemResponse addCartItem(Cart cart, Smartphone smartphone) {
         CartItem cartItem = (CartItem) objectFactory.createObject(CartItem.class);
 
@@ -60,7 +71,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public CartItemResponse deleteSmartphoneFromCart(Long userId, Long cartItemId) {
+    public CartItemResponse deleteSmartphoneFromCart(Long cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> {
                     log.error("cart item not found by id {}", cartItemId);
