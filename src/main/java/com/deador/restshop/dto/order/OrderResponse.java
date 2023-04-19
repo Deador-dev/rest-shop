@@ -1,5 +1,6 @@
 package com.deador.restshop.dto.order;
 
+import com.deador.restshop.dto.orderItemResponse.OrderItemResponse;
 import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +19,13 @@ public class OrderResponse implements Convertible {
     private Long id;
 
     private UserResponse user;
+
+    private List<OrderItemResponse> orderItems;
+
+    @NotBlank
+    @Email
+    @Size(min = 1, max = 100, message = "should be between 1 and 100 chars")
+    private String email;
 
     @NotBlank
     @Size(min = 1, max = 50, message = "should be between 1 and 50 chars")
@@ -33,11 +42,6 @@ public class OrderResponse implements Convertible {
     private String address;
 
     private String postcode;
-
-    @NotBlank
-    @Email
-    @Size(min = 1, max = 100, message = "should be between 1 and 100 chars")
-    private String email;
 
     private String additionalInformation;
 

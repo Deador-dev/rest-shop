@@ -10,11 +10,14 @@ import com.deador.restshop.security.UserPrincipal;
 import java.util.List;
 
 public interface CartItemService {
-    List<CartItemResponse> getCartItemResponsesByCartResponse(CartResponse cartResponse);
+    List<CartItem> getCartItemsByCartId(Long id);
+
+    List<CartItemResponse> getCartItemResponsesByCartId(Long id);
 
     CartItem getCartItemById(Long id);
 
     CartItemResponse addCartItem(Cart cart, Smartphone smartphone);
 
     CartItemResponse deleteCartItemById(Long id);
+
 }

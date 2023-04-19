@@ -41,8 +41,13 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public List<CartItemResponse> getCartItemResponsesByCartResponse(CartResponse cartResponse) {
-        return cartItemRepository.findAllByCartId(cartResponse.getId()).stream()
+    public List<CartItem> getCartItemsByCartId(Long id) {
+        return cartItemRepository.findAllByCartId(id);
+    }
+
+    @Override
+    public List<CartItemResponse> getCartItemResponsesByCartId(Long id) {
+        return cartItemRepository.findAllByCartId(id).stream()
                 .map(cartItem -> (CartItemResponse) dtoConverter.convertToDTO(cartItem, CartItemResponse.class))
                 .collect(Collectors.toList());
     }

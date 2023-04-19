@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +23,12 @@ public class Order implements Convertible {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
+
+    @Column
+    private String email;
 
     @Column
     private String firstName;
@@ -40,9 +47,6 @@ public class Order implements Convertible {
 
     @Column
     private String postcode;
-
-    @Column
-    private String email;
 
     @Column
     private String additionalInformation;

@@ -49,9 +49,4 @@ public class OrderProfile implements Convertible {
     @NotBlank
     @Size(min = 1, max = 1500, message = "should be between 1 and 1500 chars")
     private String additionalInformation;
-
-    @NotNull
-    @Min(1)
-    @Max(999999)
-    private Double totalAmount;
 }

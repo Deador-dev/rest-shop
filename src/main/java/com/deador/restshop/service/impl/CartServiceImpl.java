@@ -70,7 +70,7 @@ public class CartServiceImpl implements CartService {
                     return new NotExistException(String.format(USER_NOT_FOUND_BY_ID, id));
                 }), UserResponse.class));
 
-        cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartResponse(cartResponse));
+        cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartId(cartResponse.getId()));
 
         return cartResponse;
     }
@@ -103,8 +103,8 @@ public class CartServiceImpl implements CartService {
         cart.setQuantity(cart.getQuantity() + quantity);
         cart.setPrice(cart.getPrice() + cartPrice);
 
-        CartResponse cartResponse = dtoConverter.convertToDTO(cart, CartResponse.class);
-        cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartResponse(cartResponse));
+        CartResponse cartResponse = dtoConverter.convertToDTO(cartRepository.save(cart), CartResponse.class);
+        cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartId(cartResponse.getId()));
 
         log.debug("smartphone with id {} was added to cart successfully for user with id {}", smartphoneId, userId);
         return cartResponse;
@@ -119,8 +119,8 @@ public class CartServiceImpl implements CartService {
 
         cartItemService.deleteCartItemById(cartItemId);
 
-        CartResponse cartResponse = dtoConverter.convertToDTO(cart, CartResponse.class);
-        cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartResponse(cartResponse));
+        CartResponse cartResponse = dtoConverter.convertToDTO(cartRepository.save(cart), CartResponse.class);
+        cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartId(cartResponse.getId()));
 
         return cartResponse;
     }

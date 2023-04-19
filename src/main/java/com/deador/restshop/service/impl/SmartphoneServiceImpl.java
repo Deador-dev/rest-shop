@@ -134,7 +134,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
             throw new DatabaseRepositoryException(SMARTPHONE_DELETING_ERROR);
         }
 
-        log.debug("smartphone was successfully deleted = {}", smartphone);
+        log.debug("smartphone was successfully deleted {}", smartphone);
 
         return dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
     }

@@ -52,6 +52,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(exception, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(EmptyCartException.class)
+    public final ResponseEntity<Object> handleEmptyCartException(EmptyCartException exception) {
+        return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
                                                                   HttpHeaders headers,
