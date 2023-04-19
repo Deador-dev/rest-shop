@@ -46,8 +46,8 @@ public class CartController {
 
     @PreAuthorize("hasRole('ADMIN') or (isAuthenticated() and authentication.principal.id == @cartItemServiceImpl.getCartItemById(#cartItemId).cart.user.id)")
     @DeleteMapping("/cart/delete-from-cart/{id}")
-    // FIXME: 18.04.2023 need to change ResponseEntity<CartItemResponse> -> ResponseEntity<CartResponse>
-    public ResponseEntity<CartItemResponse> deleteSmartphoneFromCart(@PathVariable(name = "id") Long cartItemId) {
-        return ResponseEntity.status(HttpStatus.OK).body(cartItemService.deleteSmartphoneFromCart(cartItemId));
+    public ResponseEntity<CartResponse> deleteSmartphoneFromCart(@PathVariable(name = "id") Long cartItemId,
+                                                                 @AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.deleteSmartphoneFromCart(user.getId(), cartItemId));
     }
 }

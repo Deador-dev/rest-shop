@@ -18,6 +18,11 @@ public class OrderProfile implements Convertible {
     private Long UserId;
 
     @NotBlank
+    @Email
+    @Size(min = 1, max = 100, message = "should be between 1 and 100 chars")
+    private String email;
+
+    @NotBlank
     @Size(min = 1, max = 50, message = "should be between 1 and 50 chars")
     private String firstName;
 
@@ -42,17 +47,8 @@ public class OrderProfile implements Convertible {
     private String postcode;
 
     @NotBlank
-    @Email
-    @Size(min = 1, max = 100, message = "should be between 1 and 100 chars")
-    private String email;
-
-    @NotBlank
     @Size(min = 1, max = 1500, message = "should be between 1 and 1500 chars")
     private String additionalInformation;
-
-    @NotBlank
-    @Size(min = 1, max = 100, message = "should be between 1 and 100 chars")
-    private String deliveryStatus;
 
     @NotNull
     @Min(1)

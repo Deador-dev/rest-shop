@@ -2,6 +2,7 @@ package com.deador.restshop.controller;
 
 import com.deador.restshop.dto.order.OrderProfile;
 import com.deador.restshop.dto.order.OrderResponse;
+import com.deador.restshop.service.OrderItemService;
 import com.deador.restshop.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/shop")
 @Slf4j
 public class OrderController {
     private final OrderService orderService;
+    private final OrderItemService orderItemService;
 
     @Autowired
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService,
+                           OrderItemService orderItemService) {
         this.orderService = orderService;
+        this.orderItemService = orderItemService;
     }
 
     @PostMapping("/order")

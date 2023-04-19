@@ -8,10 +8,8 @@ import com.deador.restshop.entity.CartItem;
 import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
-import com.deador.restshop.exception.UserAuthenticationException;
 import com.deador.restshop.factory.ObjectFactory;
 import com.deador.restshop.repository.CartItemRepository;
-import com.deador.restshop.security.UserPrincipal;
 import com.deador.restshop.service.CartItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,15 +69,11 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public CartItemResponse deleteSmartphoneFromCart(Long cartItemId) {
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> {
-                    log.error("cart item not found by id {}", cartItemId);
-                    return new NotExistException(String.format(CART_ITEM_NOT_FOUND_BY_ID, cartItemId));
-                });
+    public CartItemResponse deleteCartItemById(Long id) {
+        CartItem cartItem = getCartItemById(id);
 
         try {
-            cartItemRepository.deleteById(cartItemId);
+            cartItemRepository.deleteById(id);
             cartItemRepository.flush();
         } catch (DataAccessException | ValidationException exception) {
             throw new DatabaseRepositoryException(CART_ITEM_DELETING_ERROR);

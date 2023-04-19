@@ -2,6 +2,7 @@ package com.deador.restshop.service.impl;
 
 import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.cart.CartResponse;
+import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
 import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.entity.Cart;
 import com.deador.restshop.entity.CartItem;
@@ -93,15 +94,34 @@ public class CartServiceImpl implements CartService {
     public CartResponse addSmartphoneToCart(Long userId, Long smartphoneId, Integer quantity) {
         Cart cart = getCartByUserId(userId);
         Smartphone smartphone = smartphoneService.getSmartphoneById(smartphoneId);
+        Double cartPrice = 0.0;
 
         for (int i = 0; i < quantity; i++) {
             cartItemService.addCartItem(cart, smartphone);
+            cartPrice += smartphone.getPrice();
         }
+        cart.setQuantity(cart.getQuantity() + quantity);
+        cart.setPrice(cart.getPrice() + cartPrice);
 
         CartResponse cartResponse = dtoConverter.convertToDTO(cart, CartResponse.class);
         cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartResponse(cartResponse));
 
         log.debug("smartphone with id {} was added to cart successfully for user with id {}", smartphoneId, userId);
+        return cartResponse;
+    }
+
+    @Override
+    public CartResponse deleteSmartphoneFromCart(Long userId, Long cartItemId) {
+        Cart cart = getCartByUserId(userId);
+
+        cart.setQuantity(cart.getQuantity() - 1);
+        cart.setPrice(cart.getPrice() - cartItemService.getCartItemById(cartItemId).getSmartphone().getPrice());
+
+        cartItemService.deleteCartItemById(cartItemId);
+
+        CartResponse cartResponse = dtoConverter.convertToDTO(cart, CartResponse.class);
+        cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartResponse(cartResponse));
+
         return cartResponse;
     }
 }

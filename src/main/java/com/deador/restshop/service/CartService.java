@@ -12,4 +12,6 @@ public interface CartService {
     CartResponse createCartForUser(User user);
 
     CartResponse addSmartphoneToCart(Long userId, Long smartphoneId, Integer quantity);
+
+    CartResponse deleteSmartphoneFromCart(Long userId, Long cartItemId);
 }

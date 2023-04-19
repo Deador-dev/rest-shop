@@ -11,8 +11,10 @@ import java.util.List;
 
 public interface CartItemService {
     List<CartItemResponse> getCartItemResponsesByCartResponse(CartResponse cartResponse);
+
     CartItem getCartItemById(Long id);
+
     CartItemResponse addCartItem(Cart cart, Smartphone smartphone);
 
-    CartItemResponse deleteSmartphoneFromCart(Long cartItemId);
+    CartItemResponse deleteCartItemById(Long id);
 }
