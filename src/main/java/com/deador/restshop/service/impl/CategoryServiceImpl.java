@@ -8,11 +8,9 @@ import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.exception.AlreadyExistException;
 import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
-import com.deador.restshop.exception.OperationWasCanceledException;
 import com.deador.restshop.repository.CategoryRepository;
 import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
-import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -55,7 +53,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id)));
+                .orElseThrow(() -> {
+                    log.error("category not found by id {}", id);
+                    return new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id));
+                });
     }
 
     @Override

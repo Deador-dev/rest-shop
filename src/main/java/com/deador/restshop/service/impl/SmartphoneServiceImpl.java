@@ -82,8 +82,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
 
-        log.debug("getting smartphone by id = " + smartphone);
-
+        log.debug("getting smartphone response {} by id {}", smartphoneResponse, id);
         return smartphoneResponse;
     }
 

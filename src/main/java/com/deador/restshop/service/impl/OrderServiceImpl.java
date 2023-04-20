@@ -6,7 +6,10 @@ import com.deador.restshop.dto.order.OrderResponse;
 import com.deador.restshop.entity.Cart;
 import com.deador.restshop.entity.CartItem;
 import com.deador.restshop.entity.Order;
+import com.deador.restshop.exception.AlreadyExistException;
+import com.deador.restshop.exception.BadRequestException;
 import com.deador.restshop.exception.EmptyCartException;
+import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.repository.OrderRepository;
 import com.deador.restshop.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @Slf4j
 public class OrderServiceImpl implements OrderService {
+    private static final String ORDER_NOT_FOUND_BY_ID = "Order not found by id: %s";
     private static final String EMPTY_CART_EXCEPTION = "Can't create order with 0 items in a cart";
     private static final String DELIVERY_STATUS_PROCESSING = "Processing";
     private final OrderRepository orderRepository;
@@ -42,6 +47,33 @@ public class OrderServiceImpl implements OrderService {
         this.cartService = cartService;
         this.cartItemService = cartItemService;
         this.dtoConverter = dtoConverter;
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrderResponses() {
+        List<OrderResponse> orderResponses = orderRepository.findAll().stream()
+                .map(order -> (OrderResponse) dtoConverter.convertToDTO(order, OrderResponse.class))
+                .collect(Collectors.toList());
+
+        log.debug("getting list of orders {}", orderResponses);
+        return orderResponses;
+    }
+
+    @Override
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("order not found by id {}", id);
+                    return new NotExistException(String.format(ORDER_NOT_FOUND_BY_ID, id));
+                });
+    }
+
+    @Override
+    public OrderResponse getOrderResponseById(Long id) {
+        OrderResponse orderResponse = dtoConverter.convertToDTO(getOrderById(id), OrderResponse.class);
+
+        log.debug("getting order response {} by id {}", orderResponse, id);
+        return orderResponse;
     }
 
     @Override
@@ -69,5 +101,22 @@ public class OrderServiceImpl implements OrderService {
 
         log.debug("order was successfully created {}", order);
         return orderResponse;
+    }
+
+    @Override
+    public OrderResponse updateDeliveryStatusById(Long id, String deliveryStatus) {
+        Order order = getOrderById(id);
+
+        if (deliveryStatus.isEmpty()) {
+            throw new BadRequestException("Delivery status can't be empty");
+        } else if (order.getDeliveryStatus().equals(deliveryStatus)) {
+            throw new AlreadyExistException(String.format("Delivery status '%s' already exist", deliveryStatus));
+        }
+
+        order.setDeliveryStatus(deliveryStatus);
+        order = orderRepository.save(order);
+
+        log.debug("the delivery status of the order with id {} was successfully updated to {}", id, deliveryStatus);
+        return dtoConverter.convertToDTO(order, OrderResponse.class);
     }
 }
