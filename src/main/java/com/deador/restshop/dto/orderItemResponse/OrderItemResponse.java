@@ -13,7 +13,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrderItemResponse implements Convertible {
     private Long id;
-    // FIXME: 19.04.2023 maybe need to add @JsonIgnore. Reason - infinity recursion
-//    private OrderResponse order;
     private SmartphoneResponse smartphone;
 }

@@ -51,7 +51,7 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/order/{id}")
     public ResponseEntity<OrderResponse> updateDeliveryStatusOfOrder(@PathVariable Long id,
-                                                                     @RequestParam() String deliveryStatus) {
+                                                                     @RequestParam String deliveryStatus) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.updateDeliveryStatusById(id, deliveryStatus));
     }
 }

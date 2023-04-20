@@ -21,6 +21,7 @@ public class SmartphoneProfile implements Convertible {
     @Size(min = 2, max = 100, message = "should be between 2 and 100 chars")
     private String name;
 
+    @NotNull
     private Long categoryId;
 
     @NotNull
@@ -109,17 +110,6 @@ public class SmartphoneProfile implements Convertible {
     @Min(1)
     @Max(999999)
     private Double weight;
-
-    private Boolean isPromotionActive;
-
-    // FIXME: 14.04.2023 need to use @Min & @Max
-//    @Min(0)
-//    @Max(999999)
-    private Double priceBeforePromotion;
-
-//    @Min(0)
-//    @Max(999999)
-    private Double priceAfterPromotion;
 
     @NotBlank
     @Size(min = 50, max = 1500, message = "should be between 50 and 1500 chars")

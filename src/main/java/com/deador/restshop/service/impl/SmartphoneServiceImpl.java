@@ -3,11 +3,13 @@ package com.deador.restshop.service.impl;
 import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.smartphone.SmartphoneProfile;
 import com.deador.restshop.dto.smartphone.SmartphoneResponse;
-import com.deador.restshop.entity.Category;
+import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
 import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.exception.AlreadyExistException;
+import com.deador.restshop.exception.BadRequestException;
 import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
+import com.deador.restshop.factory.ObjectFactory;
 import com.deador.restshop.repository.CategoryRepository;
 import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
@@ -30,6 +32,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     private static final String SMARTPHONE_NOT_FOUND_BY_ID = "Smartphone not found by id: %s";
     private static final String SMARTPHONE_ALREADY_EXIST_WITH_NAME = "Smartphone already exist with name: %s";
     private static final String SMARTPHONE_DELETING_ERROR = "Can't delete smartphone cause of relationships";
+    private static final String SMARTPHONE_IS_DISCOUNT_ACTIVE_UPDATING_ERROR = "The status of isDiscountActive for the smartphone with id %s cannot be updated because the discountPercent is not equal to 0";
     private final CategoryRepository categoryRepository;
     private final SmartphoneRepository smartphoneRepository;
     private final CategoryService categoryService;
@@ -105,21 +108,57 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
     @Override
     public SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile) {
-        if (!smartphoneRepository.existsById(id)) {
-            throw new NotExistException(String.format(SMARTPHONE_NOT_FOUND_BY_ID, id));
+        Smartphone smartphoneFromDB = getSmartphoneById(id);
+        Smartphone smartphoneFromDTO = dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class);
+
+        smartphoneFromDTO.setId(id);
+        smartphoneFromDTO.setCategory(categoryService.getCategoryById(smartphoneProfile.getCategoryId()));
+        smartphoneFromDTO.setIsDiscountActive(smartphoneFromDB.getIsDiscountActive());
+        smartphoneFromDTO.setDiscountPercent(smartphoneFromDB.getDiscountPercent());
+        smartphoneFromDTO.setDiscountedPrice(smartphoneFromDB.getDiscountedPrice());
+
+//        smartphoneFromDTO = smartphoneRepository.save(smartphoneFromDTO);
+//        smartphoneRepository.flush();
+
+        // FIXME: 20.04.2023 need to call updateIsDiscountActiveById if price was changed
+//        if (!smartphoneFromDB.getPrice().equals(smartphoneProfile.getPrice())) {
+//            UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive = UpdateSmartphoneIsDiscountActive
+//                    .builder()
+//                    .isDiscountActive(smartphoneFromDTO.getIsDiscountActive())
+//                    .discountPercent(smartphoneFromDTO.getDiscountPercent())
+//                    .build();
+//
+//            SmartphoneResponse smartphoneWithUpdatedIsDiscountActive = updateIsDiscountActiveById(id, updateSmartphoneIsDiscountActive);
+//            smartphoneFromDTO.setIsDiscountActive(smartphoneWithUpdatedIsDiscountActive.getIsDiscountActive());
+//            smartphoneFromDTO.setDiscountPercent(smartphoneWithUpdatedIsDiscountActive.getDiscountPercent());
+//            smartphoneFromDTO.setDiscountedPrice(smartphoneWithUpdatedIsDiscountActive.getDiscountedPrice());
+//
+//            smartphoneFromDTO = smartphoneRepository.save(smartphoneFromDTO);
+//        }
+
+        log.debug("updating smartphone by id {}", id);
+        return dtoConverter.convertToDTO(smartphoneRepository.save(smartphoneFromDTO), SmartphoneResponse.class);
+    }
+
+    @Override
+    public SmartphoneResponse updateIsDiscountActiveById(Long id, UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive) {
+        Smartphone smartphone = getSmartphoneById(id);
+
+        if (!updateSmartphoneIsDiscountActive.getIsDiscountActive() && updateSmartphoneIsDiscountActive.getDiscountPercent() != 0) {
+            throw new BadRequestException(String.format(SMARTPHONE_IS_DISCOUNT_ACTIVE_UPDATING_ERROR, id));
         }
 
-        Category category = null;
-        if (smartphoneProfile.getCategoryId() != null) {
-            category = categoryService.getCategoryById(smartphoneProfile.getCategoryId());
+        smartphone.setIsDiscountActive(updateSmartphoneIsDiscountActive.getIsDiscountActive());
+        smartphone.setDiscountPercent(updateSmartphoneIsDiscountActive.getDiscountPercent());
+
+        if (updateSmartphoneIsDiscountActive.getIsDiscountActive()) {
+            smartphone.setDiscountedPrice(smartphone.getPrice() * (1 - updateSmartphoneIsDiscountActive.getDiscountPercent() / 100.0));
+        } else {
+            smartphone.setDiscountedPrice(0.0);
         }
 
-        Smartphone updatedSmartphone = dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class);
-        updatedSmartphone.setId(id);
-        updatedSmartphone.setCategory(category);
-
-        log.debug("updating smartphone by id {}", updatedSmartphone);
-        return dtoConverter.convertToDTO(smartphoneRepository.save(updatedSmartphone), SmartphoneResponse.class);
+        log.debug("the isDiscountActive of the smartphone with id {} was successfully updated to {}", id, updateSmartphoneIsDiscountActive.getIsDiscountActive());
+        return dtoConverter.convertToDTO(smartphoneRepository.save(smartphone), SmartphoneResponse.class);
     }
 
     @Override
@@ -128,13 +167,13 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
         try {
             smartphoneRepository.deleteById(id);
+            smartphoneRepository.flush();
             // TODO: 15.04.2023 need to delete cartItem, orderItem, and images in future
         } catch (DataAccessException | ValidationException exception) {
             throw new DatabaseRepositoryException(SMARTPHONE_DELETING_ERROR);
         }
 
         log.debug("smartphone was successfully deleted {}", smartphone);
-
         return dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
     }
 }

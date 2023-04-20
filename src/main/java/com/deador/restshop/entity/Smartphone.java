@@ -92,15 +92,15 @@ public class Smartphone implements Convertible {
 
     @Column
     @ColumnDefault(value = "false")
-    private Boolean isPromotionActive;
+    private Boolean isDiscountActive;
 
     @Column
     @ColumnDefault(value = "0")
-    private Double priceBeforePromotion;
+    private Double discountPercent;
 
     @Column
     @ColumnDefault(value = "0")
-    private Double priceAfterPromotion;
+    private Double discountedPrice;
 
     @Column
     private String description;

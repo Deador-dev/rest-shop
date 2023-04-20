@@ -43,13 +43,12 @@ public class SmartphoneResponse implements Convertible {
     @Min(1)
     @Max(999999)
     private Double weight;
-    private Boolean isPromotionActive;
-    private Double priceBeforePromotion;
-    private Double priceAfterPromotion;
+    private Boolean isDiscountActive;
+    private Double discountPercent;
+    private Double discountedPrice;
     @NotBlank
     @Size(min = 50, max = 1500, message = "should be between 50 and 1500 chars")
     private String description;
-    // FIXME: 14.04.2023 @Size?
     private String imageName;
     @Min(0)
     @Max(999999)

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +17,6 @@ public class CategoryProfile implements Convertible {
     private Long id;
 
     @NotBlank
-    // FIXME: 14.04.2023 or @NotEmpty?
+    @Size(min = 1, max = 100, message = "should be between 1 and 100 chars")
     private String name;
 }

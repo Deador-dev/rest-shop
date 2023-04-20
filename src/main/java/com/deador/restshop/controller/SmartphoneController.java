@@ -2,6 +2,7 @@ package com.deador.restshop.controller;
 
 import com.deador.restshop.dto.smartphone.SmartphoneProfile;
 import com.deador.restshop.dto.smartphone.SmartphoneResponse;
+import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
 import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,13 @@ public class SmartphoneController {
     public ResponseEntity<SmartphoneResponse> updateSmartphone(@PathVariable Long id,
                                                                @Valid @RequestBody SmartphoneProfile smartphoneProfile) {
         return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.updateSmartphone(id, smartphoneProfile));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/smartphone/{id}/discount")
+    public ResponseEntity<SmartphoneResponse> updateIsDiscountActiveOfSmartphone(@PathVariable Long id,
+                                                                            @Valid @RequestBody UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive) {
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.updateIsDiscountActiveById(id, updateSmartphoneIsDiscountActive));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

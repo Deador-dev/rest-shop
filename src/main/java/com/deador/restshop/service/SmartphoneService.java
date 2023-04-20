@@ -2,6 +2,7 @@ package com.deador.restshop.service;
 
 import com.deador.restshop.dto.smartphone.SmartphoneProfile;
 import com.deador.restshop.dto.smartphone.SmartphoneResponse;
+import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
 import com.deador.restshop.entity.Smartphone;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface SmartphoneService {
     SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile);
 
     SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile);
+
+    SmartphoneResponse updateIsDiscountActiveById(Long id, UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive);
 
     SmartphoneResponse deleteSmartphoneById(Long id);
 }
