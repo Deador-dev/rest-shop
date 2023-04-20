@@ -2,12 +2,11 @@ package com.deador.restshop.service.impl;
 
 import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.cart.CartResponse;
-import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
 import com.deador.restshop.dto.user.UserResponse;
 import com.deador.restshop.entity.Cart;
-import com.deador.restshop.entity.CartItem;
 import com.deador.restshop.entity.Smartphone;
 import com.deador.restshop.entity.User;
+import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.factory.ObjectFactory;
 import com.deador.restshop.repository.CartItemRepository;
@@ -17,16 +16,21 @@ import com.deador.restshop.service.CartItemService;
 import com.deador.restshop.service.CartService;
 import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.ValidationException;
 
 @Service
 @Transactional
 @Slf4j
 public class CartServiceImpl implements CartService {
     private static final String USER_NOT_FOUND_FOR_CREATING_CART = "User not found for creating cart";
+    private static final String CART_NOT_FOUND_BY_ID = "Cart not found by id: %s";
     private static final String CART_NOT_FOUND_BY_USER_ID = "Cart not found by user id: %s";
     private static final String USER_NOT_FOUND_BY_ID = "User not found by id: %s";
+    private static final String CART_CLEARING_ERROR = "Can't clear the cart cause of relationships";
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
@@ -57,6 +61,15 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> {
                     log.error("cart not found by user id {}", id);
                     return new NotExistException(String.format(CART_NOT_FOUND_BY_USER_ID, id));
+                });
+    }
+
+    @Override
+    public Cart getCartByCartId(Long id) {
+        return cartRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("cart not found by id {}", id);
+                    return new NotExistException(String.format(CART_NOT_FOUND_BY_ID, id));
                 });
     }
 
@@ -123,5 +136,24 @@ public class CartServiceImpl implements CartService {
         cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartId(cartResponse.getId()));
 
         return cartResponse;
+    }
+
+    @Override
+    public CartResponse clearCartByCartId(Long id) {
+        Cart cart = getCartByCartId(id);
+
+        try {
+            cartItemService.getCartItemsByCartId(id)
+                    .forEach(cartItem -> cartItemService.deleteCartItemById(cartItem.getId()));
+
+            cart.setQuantity(0);
+            cart.setPrice(0.0);
+            cart = cartRepository.save(cart);
+        } catch (DataAccessException | ValidationException exception) {
+            throw new DatabaseRepositoryException(CART_CLEARING_ERROR);
+        }
+
+        log.debug("cart with id {} was successfully cleared", id);
+        return dtoConverter.convertToDTO(cart, CartResponse.class);
     }
 }

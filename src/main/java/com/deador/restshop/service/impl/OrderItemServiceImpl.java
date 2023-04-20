@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,16 +35,14 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public List<OrderItemResponse> createOrderItemsForOrder(List<CartItem> cartItems, Order order) {
-        List<OrderItem> orderItems = new ArrayList<>();
-
-        for (CartItem cartItem : cartItems) {
-            OrderItem orderItem = (OrderItem) objectFactory.createObject(OrderItem.class);
-            orderItem.setOrder(order);
-            orderItem.setSmartphone(cartItem.getSmartphone());
-
-            orderItem = orderItemRepository.save(orderItem);
-            orderItems.add(orderItem);
-        }
+        List<OrderItem> orderItems = cartItems.stream()
+                .map(cartItem -> {
+                    OrderItem orderItem = (OrderItem) objectFactory.createObject(OrderItem.class);
+                    orderItem.setOrder(order);
+                    orderItem.setSmartphone(cartItem.getSmartphone());
+                    return orderItemRepository.save(orderItem);
+                })
+                .collect(Collectors.toList());
 
         log.debug("creating order items {} for order {}", orderItems, order);
         return orderItems.stream()

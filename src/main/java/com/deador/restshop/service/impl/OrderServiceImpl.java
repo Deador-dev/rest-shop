@@ -65,7 +65,7 @@ public class OrderServiceImpl implements OrderService {
         orderResponse.setUser(userService.getUserResponseById(userId));
         orderResponse.setOrderItems(orderItemService.getOrderItemResponsesByOrderId(orderResponse.getId()));
 
-        // TODO: 19.04.2023 need to delete all cartItems from the cart when was created an order
+        cartService.clearCartByCartId(cart.getId());
 
         log.debug("order was successfully created {}", order);
         return orderResponse;

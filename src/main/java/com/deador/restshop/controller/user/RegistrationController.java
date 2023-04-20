@@ -25,8 +25,8 @@ public class RegistrationController {
     }
 
     @PreAuthorize("!isAuthenticated()")
-    @PostMapping("/registration")
-    public ResponseEntity<UserResponse> registration(@Valid @RequestBody UserProfile userProfile){
+    @PostMapping("/signin")
+    public ResponseEntity<UserResponse> registration(@Valid @RequestBody UserProfile userProfile) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(userProfile));
     }
 }
