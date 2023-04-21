@@ -63,7 +63,6 @@ public class UserPrincipal implements UserDetails {
         this.attributes = attributes;
     }
 
-    // FIXME: 13.04.2023 ?
     public String getName() {
         return String.valueOf(id);
     }

@@ -37,9 +37,9 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/", "/category/*", "/categories", "/smartphone/*", "/smartphones",
-                        "/signin", "/user/*", "/shop/**", "/search/**", "/activate/**")
+                        "/signup", "/user/*", "/shop/**", "/search/**", "/verify*")
                 .permitAll()
-                .antMatchers(HttpMethod.POST, "/signin").permitAll()
+                .antMatchers(HttpMethod.POST, "/signup").permitAll()
                 // TODO: 13.04.2023 .antMatchers(/swagger)
                 .antMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
                 .antMatchers("/admin/**").hasRole("ADMIN")
@@ -64,6 +64,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
 }

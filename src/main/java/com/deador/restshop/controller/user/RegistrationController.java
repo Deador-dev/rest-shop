@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -25,8 +23,14 @@ public class RegistrationController {
     }
 
     @PreAuthorize("!isAuthenticated()")
-    @PostMapping("/signin")
-    public ResponseEntity<UserResponse> registration(@Valid @RequestBody UserProfile userProfile) {
+    @GetMapping("/verify")
+    public ResponseEntity<UserResponse> verifyUser(@RequestParam String code) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.verify(code));
+    }
+
+    @PreAuthorize("!isAuthenticated()")
+    @PostMapping("/signup")
+    public ResponseEntity<UserResponse> signUp(@Valid @RequestBody UserProfile userProfile) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(userProfile));
     }
 }

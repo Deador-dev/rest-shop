@@ -10,6 +10,7 @@ import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.repository.RoleRepository;
 import com.deador.restshop.repository.UserRepository;
 import com.deador.restshop.service.CartService;
+import com.deador.restshop.service.MailSenderService;
 import com.deador.restshop.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,14 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private static final String USERS_NOT_FOUND_BY_ROLE_NAME = "Users not found by roleName: %s";
     private static final String USER_NOT_FOUND_BY_ID = "User not found by id: %s";
+    private static final String USER_NOT_FOUND_BY_VERIFICATION_CODE = "User not found by verification code: %s";
     private static final String USER_ALREADY_EXIST_WITH_EMAIL = "User already exist with email: %s";
     private static final String USER_DELETING_ERROR = "Can't delete user";
     private static final String ROLE_NOT_FOUND_BY_ROLE_NAME = "Role not found by role name: %s";
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CartService cartService;
+    private final MailSenderService mailSenderService;
     private final DTOConverter dtoConverter;
     private final PasswordEncoder passwordEncoder;
 
@@ -41,11 +44,13 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
                            CartService cartService,
+                           MailSenderService mailSenderService,
                            DTOConverter dtoConverter,
                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.cartService = cartService;
+        this.mailSenderService = mailSenderService;
         this.dtoConverter = dtoConverter;
         this.passwordEncoder = passwordEncoder;
     }
@@ -91,6 +96,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByVerificationCode(String verificationCode) {
+        return userRepository.findByVerificationCode(verificationCode)
+                .orElseThrow(() -> {
+                    log.error("user not found by verification code");
+                    return new NotExistException(String.format(USER_NOT_FOUND_BY_VERIFICATION_CODE, verificationCode));
+                });
+    }
+
+    @Override
     public UserResponse getUserResponseById(Long id) {
         return dtoConverter.convertToDTO(getUserById(id), UserResponse.class);
     }
@@ -113,14 +127,25 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(userProfile.getPassword()));
         user.setVerificationCode(UUID.randomUUID().toString());
-        // FIXME: 18.04.2023 need to set user.setStatus(false);
-        user.setStatus(true);
+        user.setStatus(false);
         user = userRepository.save(user);
         cartService.createCartForUser(user);
-        log.debug("user {} was registered successfully", user);
-        // TODO: 18.04.2023 need to create sendVerificationEmail with MailSend
 
+        mailSenderService.sendVerificationMessage(user);
+
+        log.debug("user {} was registered successfully", user);
         return dtoConverter.convertToDTO(user, UserResponse.class);
     }
 
+    @Override
+    public UserResponse verify(String verificationCode) {
+        User user = getUserByVerificationCode(verificationCode);
+
+        user.setStatus(true);
+        user.setVerificationCode(null);
+        user = userRepository.save(user);
+
+        log.debug("user {} was verified successfully", user);
+        return dtoConverter.convertToDTO(user, UserResponse.class);
+    }
 }

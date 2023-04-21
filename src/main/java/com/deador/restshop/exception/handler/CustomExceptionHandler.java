@@ -82,7 +82,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                                                         HttpHeaders headers,
                                                         HttpStatus status,
                                                         WebRequest request) {
-        // TODO: 14.04.2023 Create an appropriate error message for the BadRequestException thrown when an invalid value is used in a @PathVariable.
         return buildExceptionBody(
                 new BadRequestException(String.format("Invalid value used in URL path: '%s'." +
                         " Please ensure that the provided parameter is of the correct type and format.", exception.getValue())),
@@ -115,7 +114,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 
 
-    // TODO: 14.04.2023 need create handler for NotBlank
+    // TODO: 20.04.2023 need create handler for NotBlank & http status 401
 
     private ResponseEntity<Object> buildExceptionBody(Exception exception, HttpStatus httpStatus) {
         ExceptionResponse exceptionResponse = ExceptionResponse
