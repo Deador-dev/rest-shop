@@ -2,7 +2,7 @@ package com.deador.restshop.service;
 
 import com.deador.restshop.dto.category.CategoryProfile;
 import com.deador.restshop.dto.category.CategoryResponse;
-import com.deador.restshop.entity.Category;
+import com.deador.restshop.model.Category;
 
 import java.util.List;
 

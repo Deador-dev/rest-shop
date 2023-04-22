@@ -1,6 +1,6 @@
 package com.deador.restshop.service.impl;
 
-import com.deador.restshop.entity.User;
+import com.deador.restshop.model.User;
 import com.deador.restshop.service.MailSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

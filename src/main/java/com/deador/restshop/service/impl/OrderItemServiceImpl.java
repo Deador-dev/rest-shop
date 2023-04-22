@@ -2,9 +2,9 @@ package com.deador.restshop.service.impl;
 
 import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.orderItemResponse.OrderItemResponse;
-import com.deador.restshop.entity.CartItem;
-import com.deador.restshop.entity.Order;
-import com.deador.restshop.entity.OrderItem;
+import com.deador.restshop.model.CartItem;
+import com.deador.restshop.model.Order;
+import com.deador.restshop.model.OrderItem;
 import com.deador.restshop.factory.ObjectFactory;
 import com.deador.restshop.repository.OrderItemRepository;
 import com.deador.restshop.service.OrderItemService;

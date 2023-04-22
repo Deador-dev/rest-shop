@@ -1,11 +1,9 @@
 package com.deador.restshop.repository;
 
-import com.deador.restshop.entity.Role;
-import com.deador.restshop.entity.User;
+import com.deador.restshop.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

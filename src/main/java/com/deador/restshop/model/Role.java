@@ -1,4 +1,4 @@
-package com.deador.restshop.entity;
+package com.deador.restshop.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

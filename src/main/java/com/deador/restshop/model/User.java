@@ -1,11 +1,9 @@
-package com.deador.restshop.entity;
+package com.deador.restshop.model;
 
 import com.deador.restshop.dto.marker.Convertible;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -49,7 +47,12 @@ public class User implements Convertible {
     private String verificationCode;
 
     @Column
-    private boolean status;
+    private Boolean status;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @ToString.Exclude
+    private RefreshToken refreshToken;
 
     @Column(updatable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -68,7 +71,4 @@ public class User implements Convertible {
     public void preUpdate() {
         updateDate = LocalDateTime.now();
     }
-
-    // TODO: 13.04.2023 need to create refreshToken
-    //    private RefreshToken refreshToken;
 }

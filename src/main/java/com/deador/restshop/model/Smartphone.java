@@ -1,4 +1,4 @@
-package com.deador.restshop.entity;
+package com.deador.restshop.model;
 
 import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;

@@ -2,7 +2,7 @@ package com.deador.restshop.security;
 
 
 import com.deador.restshop.constants.RoleData;
-import com.deador.restshop.entity.User;
+import com.deador.restshop.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

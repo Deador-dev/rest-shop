@@ -1,11 +1,10 @@
 package com.deador.restshop.service.impl;
 
 import com.deador.restshop.converter.DTOConverter;
-import com.deador.restshop.dto.cart.CartResponse;
 import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
-import com.deador.restshop.entity.Cart;
-import com.deador.restshop.entity.CartItem;
-import com.deador.restshop.entity.Smartphone;
+import com.deador.restshop.model.Cart;
+import com.deador.restshop.model.CartItem;
+import com.deador.restshop.model.Smartphone;
 import com.deador.restshop.exception.DatabaseRepositoryException;
 import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.factory.ObjectFactory;

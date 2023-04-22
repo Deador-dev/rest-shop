@@ -1,6 +1,7 @@
 package com.deador.restshop.config;
 
 import com.deador.restshop.security.CustomUserDetailsService;
+import com.deador.restshop.security.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -19,10 +22,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Order(1)
 public class SecurityConfig {
+    private final JwtFilter jwtFilter;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+    public SecurityConfig(JwtFilter jwtFilter,
+                          CustomUserDetailsService customUserDetailsService) {
+        this.jwtFilter = jwtFilter;
         this.customUserDetailsService = customUserDetailsService;
     }
 
@@ -35,33 +41,18 @@ public class SecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.httpBasic()
                 .and()
+                .csrf().disable().cors()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/", "/category/*", "/categories", "/smartphone/*", "/smartphones",
-                        "/signup", "/user/*", "/shop/**", "/search/**", "/verify*")
-                .permitAll()
-                .antMatchers(HttpMethod.POST, "/signup").permitAll()
-                // TODO: 13.04.2023 .antMatchers(/swagger)
-                .antMatchers(HttpMethod.GET, "/users/**").hasRole("ADMIN")
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest()
-                .authenticated()
+                        "/user/*", "/shop/**", "/search/**", "/verify*").permitAll()
+                .antMatchers("/admin/**", "/users/**").hasRole("ADMIN")
                 .and()
-                .formLogin()
-//                .loginPage("/login")
-                .permitAll()
-                .defaultSuccessUrl("/shop")
-                // FIXME: 13.04.2023 need to use ?
-//                .usernameParameter("email")
-//                .passwordParameter("password")
-                .and()
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout()
-                // FIXME: 20.04.2023 need to change /logout to /signout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/signin")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .and()
-                .csrf().disable().cors();
-
+                .logoutRequestMatcher(new AntPathRequestMatcher("/signout")).logoutSuccessUrl("/signin");
         return http.build();
     }
 }

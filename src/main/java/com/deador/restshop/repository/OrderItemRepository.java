@@ -1,6 +1,6 @@
 package com.deador.restshop.repository;
 
-import com.deador.restshop.entity.OrderItem;
+import com.deador.restshop.model.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

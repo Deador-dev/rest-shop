@@ -3,10 +3,9 @@ package com.deador.restshop.service;
 import com.deador.restshop.dto.smartphone.SmartphoneProfile;
 import com.deador.restshop.dto.smartphone.SmartphoneResponse;
 import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
-import com.deador.restshop.entity.Smartphone;
+import com.deador.restshop.model.Smartphone;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SmartphoneService {
     List<SmartphoneResponse> getAllSmartphoneResponses();

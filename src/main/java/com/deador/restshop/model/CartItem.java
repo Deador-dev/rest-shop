@@ -1,4 +1,4 @@
-package com.deador.restshop.entity;
+package com.deador.restshop.model;
 
 import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
@@ -13,15 +13,15 @@ import javax.persistence.*;
 @Data
 @Builder
 @Entity
-@Table(name = "order_items")
-public class OrderItem implements Convertible {
+@Table(name = "cart_items")
+public class CartItem implements Convertible {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "smartphone_id")

@@ -62,6 +62,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(exception, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UserAuthenticationException.class)
+    public final ResponseEntity<Object> handleUserAuthenticationException(UserAuthenticationException exception) {
+        return buildExceptionBody(exception, HttpStatus.UNAUTHORIZED);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
                                                                   HttpHeaders headers,
@@ -111,7 +116,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                                                                           WebRequest request) {
         return buildExceptionBody(new BadRequestException(exception.getMessage()), status);
     }
-
 
 
     // TODO: 20.04.2023 need create handler for NotBlank & http status 401

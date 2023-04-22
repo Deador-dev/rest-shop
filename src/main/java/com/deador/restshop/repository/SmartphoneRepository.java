@@ -1,6 +1,6 @@
 package com.deador.restshop.repository;
 
-import com.deador.restshop.entity.Smartphone;
+import com.deador.restshop.model.Smartphone;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

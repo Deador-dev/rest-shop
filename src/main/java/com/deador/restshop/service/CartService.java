@@ -1,8 +1,8 @@
 package com.deador.restshop.service;
 
 import com.deador.restshop.dto.cart.CartResponse;
-import com.deador.restshop.entity.Cart;
-import com.deador.restshop.entity.User;
+import com.deador.restshop.model.Cart;
+import com.deador.restshop.model.User;
 
 public interface CartService {
     Cart getCartByUserId(Long id);

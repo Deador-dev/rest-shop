@@ -1,6 +1,6 @@
 package com.deador.restshop.repository;
 
-import com.deador.restshop.entity.Category;
+import com.deador.restshop.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

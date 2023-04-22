@@ -1,9 +1,8 @@
 package com.deador.restshop.service;
 
-import com.deador.restshop.dto.cartItemResponse.CartItemResponse;
 import com.deador.restshop.dto.orderItemResponse.OrderItemResponse;
-import com.deador.restshop.entity.CartItem;
-import com.deador.restshop.entity.Order;
+import com.deador.restshop.model.CartItem;
+import com.deador.restshop.model.Order;
 
 import java.util.List;
 

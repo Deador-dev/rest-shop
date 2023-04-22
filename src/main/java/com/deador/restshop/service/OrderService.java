@@ -2,7 +2,7 @@ package com.deador.restshop.service;
 
 import com.deador.restshop.dto.order.OrderProfile;
 import com.deador.restshop.dto.order.OrderResponse;
-import com.deador.restshop.entity.Order;
+import com.deador.restshop.model.Order;
 
 import java.util.List;
 
