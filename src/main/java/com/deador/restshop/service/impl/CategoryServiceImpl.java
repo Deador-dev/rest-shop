@@ -47,14 +47,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(category -> (CategoryResponse) dtoConverter.convertToDTO(category, CategoryResponse.class))
                 .collect(Collectors.toList());
 
-        log.debug("getting list of categories = " + allCategoryResponses);
+        log.debug("get list of category responses '{}'", allCategoryResponses);
         return allCategoryResponses;
     }
 
     public Category getCategoryById(Long id) {
+        log.debug("get category by id '{}'", id);
         return categoryRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("category not found by id {}", id);
+                    log.error("category not found by id '{}'", id);
                     return new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id));
                 });
     }
@@ -63,8 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse getCategoryResponseById(Long id) {
         Category category = getCategoryById(id);
 
-        log.debug("getting category by id = " + category);
-
+        log.debug("get category response by id '{}'", id);
         return dtoConverter.convertToDTO(category, CategoryResponse.class);
     }
 
@@ -75,8 +75,8 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         Category category = categoryRepository.save(dtoConverter.convertToEntity(categoryProfile, Category.class));
-        log.debug("adding new category = " + category);
 
+        log.debug("category was created successfully '{}'", category);
         return dtoConverter.convertToDTO(category, CategoryResponse.class);
     }
 
@@ -91,8 +91,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = dtoConverter.convertToEntity(categoryProfile, Category.class);
         category.setId(id);
 
-        log.debug("updating category by id = " + category);
-
+        log.debug("category with id '{}' was updated successfully '{}'", id, category);
         return dtoConverter.convertToDTO(categoryRepository.save(category), CategoryResponse.class);
     }
 
@@ -105,7 +104,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (smartphonesByCategoryId.isEmpty()) {
                 categoryRepository.deleteById(id);
                 categoryRepository.flush();
-                log.debug("category {} was successfully deleted", category);
+                log.debug("category was successfully deleted by id '{}'", id);
                 return dtoConverter.convertToDTO(category, CategoryResponse.class);
             }
 
@@ -116,7 +115,7 @@ public class CategoryServiceImpl implements CategoryService {
                 categoryRepository.deleteById(id);
                 categoryRepository.flush();
 
-                log.debug("category {} was successfully deleted", category);
+                log.debug("category was successfully deleted by id '{}'", id);
                 return dtoConverter.convertToDTO(category, CategoryResponse.class);
             }
 

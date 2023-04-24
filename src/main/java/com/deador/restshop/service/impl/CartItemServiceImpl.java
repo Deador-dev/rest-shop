@@ -41,11 +41,13 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public List<CartItem> getCartItemsByCartId(Long id) {
+        log.debug("get list of cart items by cart id '{}'", id);
         return cartItemRepository.findAllByCartId(id);
     }
 
     @Override
     public List<CartItemResponse> getCartItemResponsesByCartId(Long id) {
+        log.debug("get list of cart item responses by cart id '{}'", id);
         return cartItemRepository.findAllByCartId(id).stream()
                 .map(cartItem -> (CartItemResponse) dtoConverter.convertToDTO(cartItem, CartItemResponse.class))
                 .collect(Collectors.toList());
@@ -53,9 +55,10 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public CartItem getCartItemById(Long id) {
+        log.debug("get cart item by id '{}'", id);
         return cartItemRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("cart item not found by id {}", id);
+                    log.error("cart item not found by id '{}'", id);
                     return new NotExistException(String.format(CART_ITEM_NOT_FOUND_BY_ID, id));
                 });
     }
@@ -68,7 +71,7 @@ public class CartItemServiceImpl implements CartItemService {
         cartItem.setSmartphone(smartphone);
         cartItemRepository.save(cartItem);
 
-        log.debug("adding smartphone by id {} to cart", smartphone.getId());
+        log.debug("adding smartphone by id '{}' to cart with id '{}'", smartphone.getId(), cart.getId());
         return dtoConverter.convertToDTO(cartItemRepository.save(cartItem), CartItemResponse.class);
     }
 
@@ -83,7 +86,7 @@ public class CartItemServiceImpl implements CartItemService {
             throw new DatabaseRepositoryException(CART_ITEM_DELETING_ERROR);
         }
 
-        log.debug("cart item {} was successfully deleted", cartItem);
+        log.debug("cart item by id '{}' was successfully deleted", cartItem.getId());
         return dtoConverter.convertToDTO(cartItem, CartItemResponse.class);
     }
 }

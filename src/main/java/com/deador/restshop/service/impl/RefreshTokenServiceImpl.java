@@ -38,9 +38,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         if (user.getRefreshToken() != null) {
             user.getRefreshToken().setToken(encodedRefreshToken);
         } else {
-            user.setRefreshToken(new RefreshToken().builder().user(user).token(encodedRefreshToken).build());
+            user.setRefreshToken(RefreshToken.builder().user(user).token(encodedRefreshToken).build());
         }
 
+        log.debug("refresh token was assigned successfully for user with email '{}'", user.getEmail());
         return rawRefreshToken;
     }
 
@@ -50,6 +51,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         RefreshToken refreshTokenFromDB = getRefreshToken(refreshToken);
         refreshTokenFromDB.revoke();
         refreshTokenRepository.delete(refreshTokenFromDB);
+        log.debug("refresh token was revoked successfully '{}'", refreshToken);
     }
 
     @Override
@@ -59,6 +61,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         String newRefreshToken = jwtUtils.generateRefreshToken(refreshToken.getId());
         refreshToken.setToken(passwordEncoder.encode(newRefreshToken));
 
+        log.debug("access token was refreshed successfully by oldRefreshToken '{}'", oldRefreshToken);
         return RefreshTokenResponse.builder()
                 .accessToken(jwtUtils.generateAccessToken(refreshToken.getUser().getEmail()))
                 .refreshToken(newRefreshToken)
@@ -67,14 +70,20 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private void validateRefreshToken(String rawRefreshToken) {
         if (!jwtUtils.isRefreshTokenValid(rawRefreshToken)) {
+            log.error("refresh token is invalid or has been expired '{}'", rawRefreshToken);
             throw new UserAuthenticationException(UNPROCESSED_REFRESH_TOKEN);
         }
     }
 
     private RefreshToken getRefreshToken(String rawRefreshToken) {
         Long userId = jwtUtils.getUserIdFromRefreshToken(rawRefreshToken);
+
+        log.debug("get refresh token by rawRefreshToken '{}'", rawRefreshToken);
         return refreshTokenRepository.findById(userId)
                 .filter(refreshToken -> passwordEncoder.matches(rawRefreshToken, refreshToken.getToken()))
-                .orElseThrow(() -> new UserAuthenticationException(UNPROCESSED_REFRESH_TOKEN));
+                .orElseThrow(() -> {
+                    log.error("refresh token is invalid or has been expired '{}'", rawRefreshToken);
+                    return new UserAuthenticationException(UNPROCESSED_REFRESH_TOKEN);
+                });
     }
 }

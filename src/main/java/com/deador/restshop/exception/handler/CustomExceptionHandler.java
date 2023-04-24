@@ -67,6 +67,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(exception, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(UserPermissionException.class)
+    public final ResponseEntity<Object> handleUserPermissionException(UserPermissionException exception) {
+        return buildExceptionBody(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(NotVerifiedUserException.class)
+    public final ResponseEntity<Object> handleNotVerifiedUserException(NotVerifiedUserException exception) {
+        return buildExceptionBody(exception, HttpStatus.UNAUTHORIZED);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
                                                                   HttpHeaders headers,

@@ -32,7 +32,6 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String accessToken = jwtUtils.getJwtFromRequest(request);
-
             if (StringUtils.hasText(accessToken) && jwtUtils.isAccessTokenValid(accessToken)) {
                 String email = jwtUtils.getEmailFromAccessToken(accessToken);
                 UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
@@ -40,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("User with email {} successfully authenticate with token {}", email, accessToken);
+                log.debug("User with email {} successfully authorized with token {}", email, accessToken);
             } else {
                 log.debug(String.format(ABSENT_TOKEN, request.getRequestURI()));
             }

@@ -57,18 +57,20 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getCartByUserId(Long id) {
+        log.debug("get cart by user id '{}'", id);
         return cartRepository.findByUserId(id)
                 .orElseThrow(() -> {
-                    log.error("cart not found by user id {}", id);
+                    log.error("cart not found by user id '{}'", id);
                     return new NotExistException(String.format(CART_NOT_FOUND_BY_USER_ID, id));
                 });
     }
 
     @Override
     public Cart getCartByCartId(Long id) {
+        log.debug("get cart by id '{}'", id);
         return cartRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("cart not found by id {}", id);
+                    log.error("cart not found by id '{}'", id);
                     return new NotExistException(String.format(CART_NOT_FOUND_BY_ID, id));
                 });
     }
@@ -79,12 +81,13 @@ public class CartServiceImpl implements CartService {
 
         cartResponse.setUser(dtoConverter.convertToDTO(userRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("user not found by id {}", id);
+                    log.error("user not found by id '{}'", id);
                     return new NotExistException(String.format(USER_NOT_FOUND_BY_ID, id));
                 }), UserResponse.class));
 
         cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartId(cartResponse.getId()));
 
+        log.debug("get cart response '{}' by user id '{}'", cartResponse, id);
         return cartResponse;
     }
 
@@ -99,7 +102,7 @@ public class CartServiceImpl implements CartService {
         cart.setPrice(0.0);
         cart.setUser(user);
 
-        log.debug("cart was created successfully for user {}", user);
+        log.debug("cart was created successfully for user with email '{}'", user.getEmail());
         return dtoConverter.convertToDTO(cartRepository.save(cart), CartResponse.class);
     }
 
@@ -119,7 +122,7 @@ public class CartServiceImpl implements CartService {
         CartResponse cartResponse = dtoConverter.convertToDTO(cartRepository.save(cart), CartResponse.class);
         cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartId(cartResponse.getId()));
 
-        log.debug("smartphone with id {} was added to cart successfully for user with id {}", smartphoneId, userId);
+        log.debug("smartphone with id '{}' was added to cart successfully for user with id '{}'", smartphoneId, userId);
         return cartResponse;
     }
 
@@ -135,6 +138,7 @@ public class CartServiceImpl implements CartService {
         CartResponse cartResponse = dtoConverter.convertToDTO(cartRepository.save(cart), CartResponse.class);
         cartResponse.setCartItems(cartItemService.getCartItemResponsesByCartId(cartResponse.getId()));
 
+        log.debug("cart item with id '{}' was deleted from cart successfully for user with id '{}'", cartItemId, userId);
         return cartResponse;
     }
 
@@ -153,7 +157,7 @@ public class CartServiceImpl implements CartService {
             throw new DatabaseRepositoryException(CART_CLEARING_ERROR);
         }
 
-        log.debug("cart with id {} was successfully cleared", id);
+        log.debug("cart with id '{}' was successfully cleared", id);
         return dtoConverter.convertToDTO(cart, CartResponse.class);
     }
 }

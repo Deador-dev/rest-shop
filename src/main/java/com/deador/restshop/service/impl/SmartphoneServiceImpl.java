@@ -54,7 +54,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
                 .map(smartphone -> (SmartphoneResponse) dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class))
                 .collect(Collectors.toList());
 
-        log.debug("getting list of smartphones = " + smartphoneResponses);
+        log.debug("get list of smartphone responses '{}' ", smartphoneResponses);
         return smartphoneResponses;
     }
 
@@ -65,14 +65,15 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         }
         List<Smartphone> smartphones = smartphoneRepository.findAllByCategoryId(id);
 
-        log.debug("getting list of smartphones = " + smartphones);
+        log.debug("get list of smartphones '{}' by category id '{}'", smartphones, id);
         return smartphones;
     }
 
     public Smartphone getSmartphoneById(Long id) {
+        log.debug("get smartphone by id '{}'", id);
         return smartphoneRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("smartphone not found by id {}", id);
+                    log.error("smartphone not found by id '{}'", id);
                     return new NotExistException(String.format(SMARTPHONE_NOT_FOUND_BY_ID, id));
                 });
     }
@@ -84,7 +85,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
 
-        log.debug("getting smartphone response {} by id {}", smartphoneResponse, id);
+        log.debug("get smartphone responses '{}' by id '{}'", smartphoneResponse, id);
         return smartphoneResponse;
     }
 
@@ -97,7 +98,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         }
 
         Smartphone smartphone = smartphoneRepository.save(dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class));
-        log.debug("adding new smartphone = " + smartphone);
+        log.debug("smartphone was created successfully '{}'", smartphone);
 
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
@@ -135,7 +136,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 //            smartphoneFromDTO = smartphoneRepository.save(smartphoneFromDTO);
 //        }
 
-        log.debug("updating smartphone by id {}", id);
+        log.debug("smartphone was updated successfully by id '{}'", id);
         return dtoConverter.convertToDTO(smartphoneRepository.save(smartphoneFromDTO), SmartphoneResponse.class);
     }
 
@@ -156,7 +157,8 @@ public class SmartphoneServiceImpl implements SmartphoneService {
             smartphone.setDiscountedPrice(0.0);
         }
 
-        log.debug("the isDiscountActive of the smartphone with id {} was successfully updated to {}", id, updateSmartphoneIsDiscountActive.getIsDiscountActive());
+        log.debug("the isDiscountActive of the smartphone with id '{}' was successfully updated to '{}' with discount percent '{}'",
+                id, updateSmartphoneIsDiscountActive.getIsDiscountActive(), updateSmartphoneIsDiscountActive.getDiscountPercent());
         return dtoConverter.convertToDTO(smartphoneRepository.save(smartphone), SmartphoneResponse.class);
     }
 
@@ -172,7 +174,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
             throw new DatabaseRepositoryException(SMARTPHONE_DELETING_ERROR);
         }
 
-        log.debug("smartphone was successfully deleted {}", smartphone);
+        log.debug("smartphone was successfully deleted by id '{}'", id);
         return dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
     }
 }

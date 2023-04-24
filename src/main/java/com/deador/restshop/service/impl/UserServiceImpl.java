@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
         List<UserResponse> userResponses = userRepository.findAll().stream()
                 .map(user -> (UserResponse) dtoConverter.convertToDTO(user, UserResponse.class))
                 .collect(Collectors.toList());
-        log.debug("getting list of users {}", userResponses);
+        log.debug("get list of users '{}'", userResponses);
 
         return userResponses;
     }
@@ -84,12 +84,12 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> getUserResponsesByRole(String roleName) {
         List<User> users = userRepository.findByRoleName(roleName)
                 .orElseThrow(() -> {
-                    log.error("users not found by role name {}", roleName);
+                    log.error("users not found by role name '{}'", roleName);
                     return new NotExistException(String.format(USERS_NOT_FOUND_BY_ROLE_NAME, roleName));
                 });
 
         if (users.isEmpty()) {
-            log.error("users not found by role name {}", roleName);
+            log.error("users not found by role name '{}'", roleName);
             throw new NotExistException(String.format(USERS_NOT_FOUND_BY_ROLE_NAME, roleName));
         }
 
@@ -97,39 +97,43 @@ public class UserServiceImpl implements UserService {
                 .map(user -> (UserResponse) dtoConverter.convertToDTO(user, UserResponse.class))
                 .collect(Collectors.toList());
 
-        log.debug("getting list of users by role name {}", userResponses);
+        log.debug("get list of user responses '{}' by role name '{}'", userResponses, roleName);
         return userResponses;
     }
 
     @Override
     public User getUserById(Long id) {
+        log.debug("get user by id '{}'", id);
         return userRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("user not found by id {}", id);
+                    log.error("user not found by id '{}'", id);
                     return new NotExistException(String.format(USER_NOT_FOUND_BY_ID, id));
                 });
     }
 
     @Override
     public User getUserByEmail(String email) {
+        log.debug("get user by email '{}'", email);
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    log.error("user not found by email {}", email);
+                    log.error("user not found by email '{}'", email);
                     return new NotExistException(String.format(USER_NOT_FOUND_BY_EMAIL, email));
                 });
     }
 
     @Override
     public User getUserByVerificationCode(String verificationCode) {
+        log.debug("get user by verificationCode '{}'", verificationCode);
         return userRepository.findByVerificationCode(verificationCode)
                 .orElseThrow(() -> {
-                    log.error("user not found by verification code");
+                    log.error("user not found by verification code '{}'", verificationCode);
                     return new NotExistException(String.format(USER_NOT_FOUND_BY_VERIFICATION_CODE, verificationCode));
                 });
     }
 
     @Override
     public UserResponse getUserResponseById(Long id) {
+        log.debug("get user response by id '{}'", id);
         return dtoConverter.convertToDTO(getUserById(id), UserResponse.class);
     }
 
@@ -145,7 +149,7 @@ public class UserServiceImpl implements UserService {
 
         user.setRoles(Collections.singletonList(roleRepository.findByName(RoleData.USER.getDBRoleName())
                 .orElseThrow(() -> {
-                    log.error("role not found by role name {}", RoleData.USER.getDBRoleName());
+                    log.error("role not found by role name '{}'", RoleData.USER.getDBRoleName());
                     return new NotExistException(String.format(ROLE_NOT_FOUND_BY_ROLE_NAME, RoleData.USER.getDBRoleName()));
                 })));
 
@@ -157,7 +161,7 @@ public class UserServiceImpl implements UserService {
 
         mailSenderService.sendVerificationMessage(user);
 
-        log.debug("user {} was registered successfully", user);
+        log.debug("user with email '{}' was registered successfully", user.getEmail());
         return dtoConverter.convertToDTO(user, UserResponse.class);
     }
 
@@ -169,7 +173,7 @@ public class UserServiceImpl implements UserService {
         user.setVerificationCode(null);
         user = userRepository.save(user);
 
-        log.debug("user {} was verified successfully", user);
+        log.debug("user with email '{}' was verified successfully", user.getEmail());
         return dtoConverter.convertToDTO(user, UserResponse.class);
     }
 
@@ -183,7 +187,7 @@ public class UserServiceImpl implements UserService {
             throw new UserAuthenticationException(WRONG_PASSWORD);
         }
 
-        log.debug("user {} logged successfully", userLogin);
+        log.debug("user '{}' with email '{}' logged successfully", userLogin, userLogin.getEmail());
         return SuccessLogin.builder()
                 .id(user.getId())
                 .email(user.getEmail())

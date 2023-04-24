@@ -48,6 +48,6 @@ public class MailSenderServiceImpl implements MailSenderService {
         mailMessage.setText(message);
 
         javaMailSender.send(mailMessage);
-        log.debug("Email has been sent to {}", user.getEmail());
+        log.debug("Email has been sent to '{}'", user.getEmail());
     }
 }

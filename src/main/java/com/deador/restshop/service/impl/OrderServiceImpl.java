@@ -55,25 +55,24 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> (OrderResponse) dtoConverter.convertToDTO(order, OrderResponse.class))
                 .collect(Collectors.toList());
 
-        log.debug("getting list of orders {}", orderResponses);
+        log.debug("get list of order responses '{}'", orderResponses);
         return orderResponses;
     }
 
     @Override
     public Order getOrderById(Long id) {
+        log.debug("get order by id '{}'", id);
         return orderRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("order not found by id {}", id);
+                    log.error("order not found by id '{}'", id);
                     return new NotExistException(String.format(ORDER_NOT_FOUND_BY_ID, id));
                 });
     }
 
     @Override
     public OrderResponse getOrderResponseById(Long id) {
-        OrderResponse orderResponse = dtoConverter.convertToDTO(getOrderById(id), OrderResponse.class);
-
-        log.debug("getting order response {} by id {}", orderResponse, id);
-        return orderResponse;
+        log.debug("get order response by id '{}'", id);
+        return dtoConverter.convertToDTO(getOrderById(id), OrderResponse.class);
     }
 
     @Override
@@ -99,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
 
         cartService.clearCartByCartId(cart.getId());
 
-        log.debug("order was successfully created {}", order);
+        log.debug("order was successfully created '{}'", order);
         return orderResponse;
     }
 
@@ -116,7 +115,7 @@ public class OrderServiceImpl implements OrderService {
         order.setDeliveryStatus(deliveryStatus);
         order = orderRepository.save(order);
 
-        log.debug("the delivery status of the order with id {} was successfully updated to {}", id, deliveryStatus);
+        log.debug("the delivery status of the order with id '{}' was successfully updated to '{}'", id, deliveryStatus);
         return dtoConverter.convertToDTO(order, OrderResponse.class);
     }
 }

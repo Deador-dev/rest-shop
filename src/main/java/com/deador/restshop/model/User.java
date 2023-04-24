@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
+@ToString
 @Entity
 @Table(name = "users")
 public class User implements Convertible {

@@ -44,7 +44,7 @@ public class OrderItemServiceImpl implements OrderItemService {
                 })
                 .collect(Collectors.toList());
 
-        log.debug("creating order items {} for order {}", orderItems, order);
+        log.debug("order items '{}' was successfully created to order with id '{}'", orderItems, order.getId());
         return orderItems.stream()
                 .map(orderItem -> (OrderItemResponse) dtoConverter.convertToDTO(orderItem, OrderItemResponse.class))
                 .collect(Collectors.toList());
@@ -52,7 +52,7 @@ public class OrderItemServiceImpl implements OrderItemService {
 
     @Override
     public List<OrderItemResponse> getOrderItemResponsesByOrderId(Long id) {
-        log.debug("getting list of order items by order id {}", id);
+        log.debug("get list of order item responses by order id '{}'", id);
         return orderItemRepository.findAllByOrderId(id).stream()
                 .map(orderItem -> (OrderItemResponse) dtoConverter.convertToDTO(orderItem, OrderItemResponse.class))
                 .collect(Collectors.toList());
