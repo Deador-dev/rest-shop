@@ -7,7 +7,7 @@ import com.deador.restshop.model.Category;
 import java.util.List;
 
 public interface CategoryService {
-    List<CategoryResponse> getAllCategoryResponses();
+    List<CategoryResponse> getListOfCategoryResponses();
 
     Category getCategoryById(Long id);
 

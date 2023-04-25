@@ -14,8 +14,6 @@ import javax.validation.constraints.Size;
 @Data
 @Builder
 public class CategoryProfile implements Convertible {
-    private Long id;
-
     @NotBlank
     @Size(min = 1, max = 100, message = "should be between 1 and 100 chars")
     private String name;

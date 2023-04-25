@@ -3,11 +3,9 @@ package com.deador.restshop.service.impl;
 import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.category.CategoryProfile;
 import com.deador.restshop.dto.category.CategoryResponse;
+import com.deador.restshop.exception.*;
 import com.deador.restshop.model.Category;
 import com.deador.restshop.model.Smartphone;
-import com.deador.restshop.exception.AlreadyExistException;
-import com.deador.restshop.exception.DatabaseRepositoryException;
-import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.repository.CategoryRepository;
 import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
@@ -42,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryResponse> getAllCategoryResponses() {
+    public List<CategoryResponse> getListOfCategoryResponses() {
         List<CategoryResponse> allCategoryResponses = categoryRepository.findAll().stream()
                 .map(category -> (CategoryResponse) dtoConverter.convertToDTO(category, CategoryResponse.class))
                 .collect(Collectors.toList());
@@ -83,8 +81,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse updateCategory(Long id, CategoryProfile categoryProfile) {
         if (!categoryRepository.existsById(id)) {
+            log.error("category not found by id '{}'", id);
             throw new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id));
         } else if (categoryRepository.existsByName(categoryProfile.getName())) {
+            log.error("category already exist with name '{}'", categoryProfile.getName());
             throw new AlreadyExistException(String.format(CATEGORY_ALREADY_EXIST_WITH_NAME, categoryProfile.getName()));
         }
 
@@ -109,17 +109,17 @@ public class CategoryServiceImpl implements CategoryService {
             }
 
             if (shouldDeleteAssociatedSmartphones != null && shouldDeleteAssociatedSmartphones) {
-                smartphonesByCategoryId.forEach(smartphone -> {
-                    smartphoneRepository.deleteById(smartphone.getId());
-                });
+                smartphonesByCategoryId.forEach(smartphone -> smartphoneRepository.deleteById(smartphone.getId()));
                 categoryRepository.deleteById(id);
                 categoryRepository.flush();
 
                 log.debug("category was successfully deleted by id '{}'", id);
                 return dtoConverter.convertToDTO(category, CategoryResponse.class);
+            } else if (shouldDeleteAssociatedSmartphones != null) {
+                throw new OperationWasCanceledException();
             }
 
-            throw new DatabaseRepositoryException(CATEGORY_DELETING_ERROR);
+            throw new BadRequestException(CATEGORY_DELETING_ERROR);
         } catch (DataAccessException | ValidationException exception) {
             throw new DatabaseRepositoryException(CATEGORY_DELETING_ERROR);
         }
