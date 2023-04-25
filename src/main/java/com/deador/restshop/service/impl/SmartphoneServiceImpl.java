@@ -81,11 +81,14 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     @Override
     public SmartphoneResponse getSmartphoneResponseById(Long id) {
         Smartphone smartphone = getSmartphoneById(id);
+        smartphone.setCountOfViews(smartphone.getCountOfViews() + 1L);
+        log.debug("the count of views for smartphone with id '{}' was updated to '{}'", id, smartphone.getCountOfViews());
+        smartphoneRepository.save(smartphone);
 
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
 
-        log.debug("get smartphone responses '{}' by id '{}'", smartphoneResponse, id);
+        log.debug("get smartphone responses by id '{}'", id);
         return smartphoneResponse;
     }
 

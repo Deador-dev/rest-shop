@@ -52,7 +52,10 @@ public class SecurityConfig {
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/signout")).logoutSuccessUrl("/signin");
+                .logoutRequestMatcher(new AntPathRequestMatcher("/signout")).logoutSuccessUrl("/signin")
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
+                .deleteCookies("accessToken");
         return http.build();
     }
 }
