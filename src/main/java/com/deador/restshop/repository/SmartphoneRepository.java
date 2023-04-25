@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface SmartphoneRepository extends JpaRepository<Smartphone, Long> {
     List<Smartphone> findAll();
 
+    Page<Smartphone> findAll(Pageable pageable);
+
     List<Smartphone> findAllByCategoryId(Long id);
 
     Page<Smartphone> findAllByCategoryId(Long id, Pageable pageable);

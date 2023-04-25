@@ -16,6 +16,8 @@ public interface SmartphoneService {
 
     Page<SmartphoneResponse> getListOfSmartphoneResponsesByCategoryId(Long id, Pageable pageable);
 
+    Page<SmartphoneResponse> getListOfSmartphoneResponsesWithSorting(Pageable pageable);
+
     Smartphone getSmartphoneById(Long id);
 
     SmartphoneResponse getSmartphoneResponseById(Long id);

@@ -16,9 +16,7 @@ import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +34,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     private static final String SMARTPHONE_DELETING_ERROR = "Can't delete smartphone cause of relationships";
     private static final String SMARTPHONE_IS_DISCOUNT_ACTIVE_UPDATING_ERROR = "The status of isDiscountActive for the smartphone with id %s cannot be updated because the discountPercent is not equal to 0";
     private static final String SMARTPHONES_NOT_FOUND_FOR_SPECIFIED_CATEGORY_AND_PAGE = "Smartphones not found for specified category %s and page %s";
+    private static final String SORT_FIELD_NOT_FOUND = "Sort field not found";
     private final CategoryRepository categoryRepository;
     private final SmartphoneRepository smartphoneRepository;
     private final CategoryService categoryService;
@@ -75,20 +74,62 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
     @Override
     public Page<SmartphoneResponse> getListOfSmartphoneResponsesByCategoryId(Long id, Pageable pageable) {
-        Page<Smartphone> smartphones = smartphoneRepository.findAllByCategoryId(id, pageable);
+        Page<Smartphone> smartphonePage = smartphoneRepository.findAllByCategoryId(id, pageable);
 
-        if (pageable.getPageNumber() >= smartphones.getTotalPages()) {
+        if (pageable.getPageNumber() >= smartphonePage.getTotalPages()) {
             throw new NotExistException(String.format(SMARTPHONES_NOT_FOUND_FOR_SPECIFIED_CATEGORY_AND_PAGE,
                     categoryService.getCategoryById(id).getName(),
                     pageable.getPageNumber()));
         }
 
         log.debug("get list of smartphone responses by category id '{}' page '{}'", id, pageable.getPageNumber());
+        return convertToSmartphoneResponsePage(smartphonePage);
+    }
+
+    @Override
+    public Page<SmartphoneResponse> getListOfSmartphoneResponsesWithSorting(Pageable pageable) {
+        String sortBy = pageable.getSort().stream()
+                .findFirst()
+                .orElseThrow(() -> {
+                    log.error("sort field not found");
+                    return new NotExistException(SORT_FIELD_NOT_FOUND);
+                })
+                .getProperty();
+        log.debug("sort by '{}'", sortBy);
+
+        Page<Smartphone> smartphonePage = switch (sortBy) {
+            case "priceLowToHigh" -> smartphoneRepository.findAll(
+                    getPageable(pageable, Sort.Direction.ASC, "price")
+            );
+            case "priceHighToLow" -> smartphoneRepository.findAll(
+                    getPageable(pageable, Sort.Direction.DESC, "price")
+            );
+            case "avgCustomerReview" -> smartphoneRepository.findAll(
+                    getPageable(pageable, Sort.Direction.DESC, "countOfViews")
+            );
+            default -> {
+                log.error("sort field not found");
+                throw new NotExistException(SORT_FIELD_NOT_FOUND);
+            }
+        };
+
+        log.debug("get list of sorted smartphones '{}'", smartphonePage.getContent());
+        return convertToSmartphoneResponsePage(smartphonePage);
+    }
+
+    private PageImpl<SmartphoneResponse> convertToSmartphoneResponsePage(Page<Smartphone> smartphonePage) {
         return new PageImpl<>(
-                smartphones.stream()
+                smartphonePage.stream()
                         .map(smartphone -> (SmartphoneResponse) dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class))
-                        .collect(Collectors.toList()), smartphones.getPageable(), smartphones.getTotalElements()
+                        .collect(Collectors.toList()), smartphonePage.getPageable(), smartphonePage.getTotalElements()
         );
+    }
+
+    private static Pageable getPageable(Pageable pageable, Sort.Direction sortDirection, String sortField) {
+        return PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sortDirection.name().equals("ASC") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending());
     }
 
     public Smartphone getSmartphoneById(Long id) {

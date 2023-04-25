@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @Slf4j
 public class SmartphoneController {
-    private static final int SMARTPHONES_PER_PAGE = 8;
+    private static final int SMARTPHONES_PER_PAGE = 4;
     private final SmartphoneService smartphoneService;
 
     @Autowired
@@ -37,6 +37,11 @@ public class SmartphoneController {
     public ResponseEntity<Page<SmartphoneResponse>> getSmartphonesByCategoryId(@PathVariable Long id,
                                                                                @PageableDefault(value = SMARTPHONES_PER_PAGE, sort = "id") Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getListOfSmartphoneResponsesByCategoryId(id, pageable));
+    }
+
+    @GetMapping("/smartphones/sorted")
+    public ResponseEntity<Page<SmartphoneResponse>> getSmartphonesWithSorting(@PageableDefault(value = SMARTPHONES_PER_PAGE) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getListOfSmartphoneResponsesWithSorting(pageable));
     }
 
     @GetMapping("/smartphone/{id}")
