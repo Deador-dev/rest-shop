@@ -6,6 +6,9 @@ import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
 import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +20,7 @@ import java.util.List;
 @RestController
 @Slf4j
 public class SmartphoneController {
+    private static final int SMARTPHONES_PER_PAGE = 8;
     private final SmartphoneService smartphoneService;
 
     @Autowired
@@ -26,7 +30,13 @@ public class SmartphoneController {
 
     @GetMapping("/smartphones")
     public ResponseEntity<List<SmartphoneResponse>> getSmartphones() {
-        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getAllSmartphoneResponses());
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getListOfSmartphoneResponses());
+    }
+
+    @GetMapping("/smartphones/category/{id}")
+    public ResponseEntity<Page<SmartphoneResponse>> getSmartphonesByCategoryId(@PathVariable Long id,
+                                                                               @PageableDefault(value = SMARTPHONES_PER_PAGE, sort = "id") Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getListOfSmartphoneResponsesByCategoryId(id, pageable));
     }
 
     @GetMapping("/smartphone/{id}")
@@ -50,7 +60,7 @@ public class SmartphoneController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/smartphone/{id}/discount")
     public ResponseEntity<SmartphoneResponse> updateIsDiscountActiveOfSmartphone(@PathVariable Long id,
-                                                                            @Valid @RequestBody UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive) {
+                                                                                 @Valid @RequestBody UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive) {
         return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.updateIsDiscountActiveById(id, updateSmartphoneIsDiscountActive));
     }
 

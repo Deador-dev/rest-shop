@@ -16,6 +16,9 @@ import com.deador.restshop.service.SmartphoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     private static final String SMARTPHONE_ALREADY_EXIST_WITH_NAME = "Smartphone already exist with name: %s";
     private static final String SMARTPHONE_DELETING_ERROR = "Can't delete smartphone cause of relationships";
     private static final String SMARTPHONE_IS_DISCOUNT_ACTIVE_UPDATING_ERROR = "The status of isDiscountActive for the smartphone with id %s cannot be updated because the discountPercent is not equal to 0";
+    private static final String SMARTPHONES_NOT_FOUND_FOR_SPECIFIED_CATEGORY_AND_PAGE = "Smartphones not found for specified category %s and page %s";
     private final CategoryRepository categoryRepository;
     private final SmartphoneRepository smartphoneRepository;
     private final CategoryService categoryService;
@@ -49,7 +53,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     }
 
     @Override
-    public List<SmartphoneResponse> getAllSmartphoneResponses() {
+    public List<SmartphoneResponse> getListOfSmartphoneResponses() {
         List<SmartphoneResponse> smartphoneResponses = smartphoneRepository.findAll().stream()
                 .map(smartphone -> (SmartphoneResponse) dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class))
                 .collect(Collectors.toList());
@@ -59,7 +63,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     }
 
     @Override
-    public List<Smartphone> getAllSmartphonesByCategoryId(Long id) {
+    public List<Smartphone> getListOfSmartphonesByCategoryId(Long id) {
         if (!categoryRepository.existsById(id)) {
             throw new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, id));
         }
@@ -67,6 +71,24 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
         log.debug("get list of smartphones '{}' by category id '{}'", smartphones, id);
         return smartphones;
+    }
+
+    @Override
+    public Page<SmartphoneResponse> getListOfSmartphoneResponsesByCategoryId(Long id, Pageable pageable) {
+        Page<Smartphone> smartphones = smartphoneRepository.findAllByCategoryId(id, pageable);
+
+        if (pageable.getPageNumber() >= smartphones.getTotalPages()) {
+            throw new NotExistException(String.format(SMARTPHONES_NOT_FOUND_FOR_SPECIFIED_CATEGORY_AND_PAGE,
+                    categoryService.getCategoryById(id).getName(),
+                    pageable.getPageNumber()));
+        }
+
+        log.debug("get list of smartphone responses by category id '{}' page '{}'", id, pageable.getPageNumber());
+        return new PageImpl<>(
+                smartphones.stream()
+                        .map(smartphone -> (SmartphoneResponse) dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class))
+                        .collect(Collectors.toList()), smartphones.getPageable(), smartphones.getTotalElements()
+        );
     }
 
     public Smartphone getSmartphoneById(Long id) {
