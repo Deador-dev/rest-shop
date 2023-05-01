@@ -2,6 +2,7 @@ package com.deador.restshop.config;
 
 import com.deador.restshop.security.CustomUserDetailsService;
 import com.deador.restshop.security.JwtFilter;
+import com.deador.restshop.security.RestAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +45,8 @@ public class SecurityConfig {
                 .csrf().disable().cors()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/", "/category/*", "/categories", "/smartphone/*", "/smartphones",

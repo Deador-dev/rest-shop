@@ -77,6 +77,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return buildExceptionBody(exception, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(DirectoryCreationException.class)
+    public final ResponseEntity<Object> handleDirectoryCreationException(DirectoryCreationException exception) {
+        return buildExceptionBody(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(FileTransferException.class)
+    public final ResponseEntity<Object> handleFileTransferException(FileTransferException exception) {
+        return buildExceptionBody(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exception,
                                                                   HttpHeaders headers,
@@ -126,9 +136,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                                                                           WebRequest request) {
         return buildExceptionBody(new BadRequestException(exception.getMessage()), status);
     }
-
-
-    // TODO: 20.04.2023 need create handler for NotBlank & http status 401
 
     private ResponseEntity<Object> buildExceptionBody(Exception exception, HttpStatus httpStatus) {
         ExceptionResponse exceptionResponse = ExceptionResponse

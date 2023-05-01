@@ -6,6 +6,7 @@ import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
 import com.deador.restshop.model.Smartphone;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,9 +23,9 @@ public interface SmartphoneService {
 
     SmartphoneResponse getSmartphoneResponseById(Long id);
 
-    SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile);
+    SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile, MultipartFile file);
 
-    SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile);
+    SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile, MultipartFile file);
 
     SmartphoneResponse updateIsDiscountActiveById(Long id, UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive);
 

@@ -4,11 +4,8 @@ import com.deador.restshop.converter.DTOConverter;
 import com.deador.restshop.dto.smartphone.SmartphoneProfile;
 import com.deador.restshop.dto.smartphone.SmartphoneResponse;
 import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
+import com.deador.restshop.exception.*;
 import com.deador.restshop.model.Smartphone;
-import com.deador.restshop.exception.AlreadyExistException;
-import com.deador.restshop.exception.BadRequestException;
-import com.deador.restshop.exception.DatabaseRepositoryException;
-import com.deador.restshop.exception.NotExistException;
 import com.deador.restshop.repository.CategoryRepository;
 import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
@@ -19,15 +16,24 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ValidationException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @Slf4j
 public class SmartphoneServiceImpl implements SmartphoneService {
+    private final static String uploadPath = System.getProperty("user.dir") + "/src/main/resources/static/smartphoneImages/";
+    private static final String DIRECTORY_CREATION_EXCEPTION = "Directory creation error with path: ";
     private static final String CATEGORY_NOT_FOUND_BY_ID = "Category not found by id: %s";
     private static final String SMARTPHONE_NOT_FOUND_BY_ID = "Smartphone not found by id: %s";
     private static final String SMARTPHONE_ALREADY_EXIST_WITH_NAME = "Smartphone already exist with name: %s";
@@ -156,24 +162,26 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     }
 
     @Override
-    public SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile) {
+    public SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile, MultipartFile file) {
         if (smartphoneRepository.existsByName(smartphoneProfile.getName())) {
             throw new AlreadyExistException(String.format(SMARTPHONE_ALREADY_EXIST_WITH_NAME, smartphoneProfile.getName()));
         } else if (!categoryRepository.existsById(smartphoneProfile.getCategoryId())) {
             throw new NotExistException(String.format(CATEGORY_NOT_FOUND_BY_ID, smartphoneProfile.getCategoryId()));
         }
 
-        Smartphone smartphone = smartphoneRepository.save(dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class));
-        log.debug("smartphone was created successfully '{}'", smartphone);
+        Smartphone smartphone = dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class);
 
-        SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class);
+        addImageToSmartphone(smartphone, file);
+
+        SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphoneRepository.save(smartphone), SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
 
+        log.debug("smartphone was created successfully '{}'", smartphone);
         return smartphoneResponse;
     }
 
     @Override
-    public SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile) {
+    public SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile, MultipartFile file) {
         Smartphone smartphoneFromDB = getSmartphoneById(id);
         Smartphone smartphoneFromDTO = dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class);
 
@@ -182,28 +190,38 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         smartphoneFromDTO.setIsDiscountActive(smartphoneFromDB.getIsDiscountActive());
         smartphoneFromDTO.setDiscountPercent(smartphoneFromDB.getDiscountPercent());
         smartphoneFromDTO.setDiscountedPrice(smartphoneFromDB.getDiscountedPrice());
-
-//        smartphoneFromDTO = smartphoneRepository.save(smartphoneFromDTO);
-//        smartphoneRepository.flush();
-
-        // FIXME: 20.04.2023 need to call updateIsDiscountActiveById if price was changed
-//        if (!smartphoneFromDB.getPrice().equals(smartphoneProfile.getPrice())) {
-//            UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive = UpdateSmartphoneIsDiscountActive
-//                    .builder()
-//                    .isDiscountActive(smartphoneFromDTO.getIsDiscountActive())
-//                    .discountPercent(smartphoneFromDTO.getDiscountPercent())
-//                    .build();
-//
-//            SmartphoneResponse smartphoneWithUpdatedIsDiscountActive = updateIsDiscountActiveById(id, updateSmartphoneIsDiscountActive);
-//            smartphoneFromDTO.setIsDiscountActive(smartphoneWithUpdatedIsDiscountActive.getIsDiscountActive());
-//            smartphoneFromDTO.setDiscountPercent(smartphoneWithUpdatedIsDiscountActive.getDiscountPercent());
-//            smartphoneFromDTO.setDiscountedPrice(smartphoneWithUpdatedIsDiscountActive.getDiscountedPrice());
-//
-//            smartphoneFromDTO = smartphoneRepository.save(smartphoneFromDTO);
-//        }
+        // FIXME: 01.05.2023 need to delete old image
+        addImageToSmartphone(smartphoneFromDTO, file);
 
         log.debug("smartphone was updated successfully by id '{}'", id);
         return dtoConverter.convertToDTO(smartphoneRepository.save(smartphoneFromDTO), SmartphoneResponse.class);
+    }
+
+    private static void addImageToSmartphone(Smartphone smartphone, MultipartFile file) {
+        if (!file.isEmpty()) {
+            Path uploadDir = Paths.get(uploadPath);
+
+            if (!Files.exists(uploadDir)) {
+                try {
+                    Files.createDirectories(uploadDir);
+                } catch (IOException e) {
+                    throw new DirectoryCreationException(String.format(DIRECTORY_CREATION_EXCEPTION, uploadPath));
+                }
+            }
+
+            String uuidFile = UUID.randomUUID().toString();
+            String resultFileName = uuidFile + "." + file.getOriginalFilename();
+
+            try {
+                file.transferTo(new File(uploadPath + "/" + resultFileName));
+            } catch (IOException e) {
+                throw new FileTransferException();
+            }
+
+            smartphone.setImageName(resultFileName);
+        } else {
+            smartphone.setImageName("unknown");
+        }
     }
 
     @Override
@@ -235,7 +253,6 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         try {
             smartphoneRepository.deleteById(id);
             smartphoneRepository.flush();
-            // TODO: 15.04.2023 need to delete cartItem, orderItem, and images in future
         } catch (DataAccessException | ValidationException exception) {
             throw new DatabaseRepositoryException(SMARTPHONE_DELETING_ERROR);
         }

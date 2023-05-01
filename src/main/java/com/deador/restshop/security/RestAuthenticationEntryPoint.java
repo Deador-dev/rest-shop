@@ -11,7 +11,6 @@ import java.io.IOException;
 
 @Slf4j
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    // FIXME: 13.04.2023 need to fix
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,

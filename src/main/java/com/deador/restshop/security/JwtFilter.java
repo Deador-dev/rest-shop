@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("User with email {} successfully authorized with token {}", email, accessToken);
+                log.debug("User with email {} successfully authenticate with token {}", email, accessToken);
             } else {
                 log.debug(String.format(ABSENT_TOKEN, request.getRequestURI()));
             }
