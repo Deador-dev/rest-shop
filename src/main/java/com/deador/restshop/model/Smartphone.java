@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -105,9 +107,8 @@ public class Smartphone implements Convertible {
     @Column
     private String description;
 
-    @Column
-    @ColumnDefault(value = "empty")
-    private String imageName;
+    @OneToMany(mappedBy = "smartphone", cascade = CascadeType.ALL)
+    private List<SmartphoneImage> smartphoneImages = new ArrayList<>();
 
     @Column
     @ColumnDefault(value = "0")

@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,16 +55,16 @@ public class SmartphoneController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/smartphone", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<SmartphoneResponse> addSmartphone(@Valid @RequestPart SmartphoneProfile smartphoneProfile,
-                                                            @RequestPart(value = "smartphoneImage", required = false) MultipartFile file) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(smartphoneService.addSmartphone(smartphoneProfile, file));
+                                                            @RequestPart(value = "smartphoneImages", required = false) @Nullable MultipartFile[] images) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(smartphoneService.addSmartphone(smartphoneProfile, images));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/smartphone/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<SmartphoneResponse> updateSmartphone(@PathVariable Long id,
                                                                @Valid @RequestPart SmartphoneProfile smartphoneProfile,
-                                                               @RequestPart(value = "smartphoneImage", required = false) MultipartFile file) {
-        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.updateSmartphone(id, smartphoneProfile, file));
+                                                               @RequestPart(value = "smartphoneImages", required = false) @Nullable MultipartFile[] images) {
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.updateSmartphone(id, smartphoneProfile, images));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

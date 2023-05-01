@@ -6,6 +6,7 @@ import com.deador.restshop.dto.smartphone.SmartphoneResponse;
 import com.deador.restshop.dto.smartphone.UpdateSmartphoneIsDiscountActive;
 import com.deador.restshop.exception.*;
 import com.deador.restshop.model.Smartphone;
+import com.deador.restshop.model.SmartphoneImage;
 import com.deador.restshop.repository.CategoryRepository;
 import com.deador.restshop.repository.SmartphoneRepository;
 import com.deador.restshop.service.CategoryService;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -162,7 +164,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     }
 
     @Override
-    public SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile, MultipartFile file) {
+    public SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile, MultipartFile[] images) {
         if (smartphoneRepository.existsByName(smartphoneProfile.getName())) {
             throw new AlreadyExistException(String.format(SMARTPHONE_ALREADY_EXIST_WITH_NAME, smartphoneProfile.getName()));
         } else if (!categoryRepository.existsById(smartphoneProfile.getCategoryId())) {
@@ -171,7 +173,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
 
         Smartphone smartphone = dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class);
 
-        addImageToSmartphone(smartphone, file);
+        addImagesToSmartphone(smartphone, images);
 
         SmartphoneResponse smartphoneResponse = dtoConverter.convertToDTO(smartphoneRepository.save(smartphone), SmartphoneResponse.class);
         smartphoneResponse.setCategory(categoryService.getCategoryResponseById(smartphoneResponse.getCategory().getId()));
@@ -181,7 +183,7 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     }
 
     @Override
-    public SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile, MultipartFile file) {
+    public SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile, MultipartFile[] images) {
         Smartphone smartphoneFromDB = getSmartphoneById(id);
         Smartphone smartphoneFromDTO = dtoConverter.convertToEntity(smartphoneProfile, Smartphone.class);
 
@@ -190,15 +192,17 @@ public class SmartphoneServiceImpl implements SmartphoneService {
         smartphoneFromDTO.setIsDiscountActive(smartphoneFromDB.getIsDiscountActive());
         smartphoneFromDTO.setDiscountPercent(smartphoneFromDB.getDiscountPercent());
         smartphoneFromDTO.setDiscountedPrice(smartphoneFromDB.getDiscountedPrice());
-        // FIXME: 01.05.2023 need to delete old image
-        addImageToSmartphone(smartphoneFromDTO, file);
+        // FIXME: 01.05.2023 need to create functionality for deleting images
+        addImagesToSmartphone(smartphoneFromDTO, images);
 
         log.debug("smartphone was updated successfully by id '{}'", id);
         return dtoConverter.convertToDTO(smartphoneRepository.save(smartphoneFromDTO), SmartphoneResponse.class);
     }
 
-    private static void addImageToSmartphone(Smartphone smartphone, MultipartFile file) {
-        if (!file.isEmpty()) {
+    private static void addImagesToSmartphone(Smartphone smartphone, MultipartFile[] images) {
+        List<SmartphoneImage> smartphoneImagesFromDB = smartphone.getSmartphoneImages();
+
+        if (images.length > 0 && images[0] != null && !images[0].getOriginalFilename().isEmpty()) {
             Path uploadDir = Paths.get(uploadPath);
 
             if (!Files.exists(uploadDir)) {
@@ -209,19 +213,25 @@ public class SmartphoneServiceImpl implements SmartphoneService {
                 }
             }
 
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFileName = uuidFile + "." + file.getOriginalFilename();
+            for (MultipartFile image : images) {
+                String uuidFile = UUID.randomUUID().toString();
+                String resultFileName = uuidFile + "." + image.getOriginalFilename();
 
-            try {
-                file.transferTo(new File(uploadPath + "/" + resultFileName));
-            } catch (IOException e) {
-                throw new FileTransferException();
+                try {
+                    image.transferTo(new File(uploadPath + "/" + resultFileName));
+                } catch (IOException e) {
+                    throw new FileTransferException();
+                }
+
+                SmartphoneImage smartphoneImage = SmartphoneImage.builder().smartphone(smartphone).imageName(resultFileName).build();
+                smartphoneImagesFromDB.add(smartphoneImage);
             }
-
-            smartphone.setImageName(resultFileName);
-        } else {
-            smartphone.setImageName("unknown");
+            smartphone.setSmartphoneImages(smartphoneImagesFromDB);
+            log.debug("smartphone was updated successfully with '{}' images", smartphoneImagesFromDB.size());
         }
+//        else {
+//            smartphone.setSmartphoneImages(Collections.emptyList());
+//        }
     }
 
     @Override

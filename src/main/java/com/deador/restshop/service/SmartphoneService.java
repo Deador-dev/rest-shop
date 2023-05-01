@@ -23,9 +23,9 @@ public interface SmartphoneService {
 
     SmartphoneResponse getSmartphoneResponseById(Long id);
 
-    SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile, MultipartFile file);
+    SmartphoneResponse addSmartphone(SmartphoneProfile smartphoneProfile, MultipartFile[] images);
 
-    SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile, MultipartFile file);
+    SmartphoneResponse updateSmartphone(Long id, SmartphoneProfile smartphoneProfile, MultipartFile[] images);
 
     SmartphoneResponse updateIsDiscountActiveById(Long id, UpdateSmartphoneIsDiscountActive updateSmartphoneIsDiscountActive);
 
