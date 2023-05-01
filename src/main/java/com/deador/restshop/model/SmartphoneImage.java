@@ -1,5 +1,6 @@
 package com.deador.restshop.model;
 
+import com.deador.restshop.dto.marker.Convertible;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ import javax.persistence.*;
 @Builder
 @Entity
 @Table(name = "smartphone_images")
-public class SmartphoneImage {
+public class SmartphoneImage implements Convertible {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
