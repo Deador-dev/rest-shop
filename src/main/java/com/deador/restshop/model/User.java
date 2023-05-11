@@ -50,7 +50,6 @@ public class User implements Convertible {
     @Column
     private Boolean status;
 
-    @JsonIgnore
     @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @ToString.Exclude
     private RefreshToken refreshToken;

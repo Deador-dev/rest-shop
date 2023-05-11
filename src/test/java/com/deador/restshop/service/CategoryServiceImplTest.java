@@ -69,7 +69,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    void shouldReturnListOfCategoryResponsesWhenGetListOfCategoryResponses() {
+    void getListOfCategoryResponses_thenReturnListOfCategoryResponses() {
         List<Category> genericEntityList = Arrays.asList(
                 Category.builder()
                         .id(NOT_EXISTING_CATEGORY_ID)
