@@ -20,4 +20,4 @@ To get started with the Smartphone Store API, follow these steps:
 3. Set up your MySQL database and update the database connection configuration.
 4. Configure your environment variables, including JWT secret key.
 5. Build and run the API server.
-6. Access the API endpoints through http://localhost:<PORT>.
+6. Access the API endpoints through `http://localhost:<PORT>`.
