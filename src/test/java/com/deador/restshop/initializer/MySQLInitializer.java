@@ -5,10 +5,12 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 @UtilityClass
 public class MySQLInitializer {
-    public static MySQLContainer<?> mySQLContainer = new MySQLContainer<>(" 8.0.32");
+    DockerImageName myImage = DockerImageName.parse("mysql:8.0.33").asCompatibleSubstituteFor("mysql");
+    MySQLContainer<?> mySQLContainer = new MySQLContainer<>(myImage);
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
@@ -16,9 +18,7 @@ public class MySQLInitializer {
             TestPropertyValues.of(
                             "spring.datasource.url=" + mySQLContainer.getJdbcUrl(),
                             "spring.datasource.username=" + mySQLContainer.getUsername(),
-                            "spring.datasource.password=" + mySQLContainer.getPassword(),
-                            "spring.liquibase.enabled=true",
-                            "spring.liquibase.change-log=classpath:db/changelog/db.changelog-master.xml")
+                            "spring.datasource.password=" + mySQLContainer.getPassword())
                     .applyTo(configurableApplicationContext.getEnvironment());
         }
     }

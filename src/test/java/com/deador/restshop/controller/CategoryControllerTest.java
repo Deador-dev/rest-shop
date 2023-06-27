@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,16 +33,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-//@MockitoSettings(strictness = Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CategoryControllerTest {
     private static final Long EXISTING_CATEGORY_ID = 1L;
     private static final Long NOT_EXISTING_CATEGORY_ID = 100L;
     private static final String NOT_NUMBER_CATEGORY_ID = "not_number";
     private static final String EXISTING_CATEGORY_NAME = "iPhone";
     private static final String NOT_EXISTING_CATEGORY_NAME = "Xiaomi";
-    private static final String CATEGORY_NOT_FOUND_BY_ID = "Category not found by id: %s";
-    private static final String CATEGORY_ALREADY_EXIST_WITH_NAME = "Category already exist with name: %s";
-    private static final String CATEGORY_DELETING_ERROR = "Can't delete category cause of relationships";
     private MockMvc mockMvc;
     @Mock
     private CategoryService categoryService;
