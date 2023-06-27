@@ -16,8 +16,7 @@ Welcome to the repository of the Smartphone Store API! This project aims to deve
 To get started with the Smartphone Store API, follow these steps:
 
 1. Clone this repository to your local machine.
-2. Install the necessary dependencies.
-3. Set up your MySQL database and update the database connection configuration.
-4. Configure your environment variables, including JWT secret key.
-5. Build and run the API server.
-6. Access the API endpoints through `http://localhost:<PORT>`.
+2. Set up the MySQL database and update the database configuration in application.properties file.
+3. Configure your environment variables, including JWT secret key.
+4. Build and run the API server.
+5. Access the API endpoints through `http://localhost:<PORT>`.
