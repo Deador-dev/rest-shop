@@ -25,31 +25,24 @@ public class CartController {
         this.cartItemService = cartItemService;
     }
 
-    // FIXME: 20.04.2023 maybe need to change @RequestParam Long id TO @AuthenticationPrincipal UserPrincipal user -> user.getId() ?
-    @PreAuthorize("hasRole('ADMIN') or (isAuthenticated() and authentication.principal.id == #id)")
+    @PreAuthorize("hasRole('ADMIN') or (isAuthenticated() and authentication.principal.id == #userId)")
     @GetMapping("/cart")
-    public ResponseEntity<CartResponse> getCart(@RequestParam Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(cartService.getCartResponseByUserId(id));
+    public ResponseEntity<CartResponse> getCart(@RequestParam Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.getCartResponseByUserId(userId));
     }
 
-    // FIXME: 20.04.2023 When an admin adds a smartphone from the user's cart, they do not change the user's cart, but their own personal cart.
-    //  This is because the @AuthenticationPrincipal UserPrincipal user annotation refers to the currently logged-in admin, not the user whose cart is being modified.
-    //  To modify the user's cart may need to use a different method, such as passing the user's ID as a @RequestParam.
-    @PreAuthorize("hasRole('ADMIN') or (isAuthenticated() and authentication.principal.id == @cartServiceImpl.getCartByUserId(#user.id).user.id)")
+    @PreAuthorize("hasRole('ADMIN') or (isAuthenticated() and authentication.principal.id == @cartServiceImpl.getCartByUserId(#userId).user.id)")
     @PostMapping("/cart/add-to-cart")
-    public ResponseEntity<CartResponse> addSmartphoneToCart(@RequestParam Long smartphoneId,
-                                                            @RequestParam Integer quantity,
-                                                            @AuthenticationPrincipal UserPrincipal user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addSmartphoneToCart(user.getId(), smartphoneId, quantity));
+    public ResponseEntity<CartResponse> addSmartphoneToCart(@RequestParam Long userId,
+                                                            @RequestParam Long smartphoneId,
+                                                            @RequestParam Integer quantity) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addSmartphoneToCart(userId, smartphoneId, quantity));
     }
 
-    // FIXME: 20.04.2023 When an admin deletes a smartphone from the user's cart, they do not change the user's cart, but their own personal cart.
-    //  This is because the @AuthenticationPrincipal UserPrincipal user annotation refers to the currently logged-in admin, not the user whose cart is being modified.
-    //  To modify the user's cart may need to use a different method, such as passing the user's ID as a @RequestParam.
     @PreAuthorize("hasRole('ADMIN') or (isAuthenticated() and authentication.principal.id == @cartItemServiceImpl.getCartItemById(#cartItemId).cart.user.id)")
     @DeleteMapping("/cart/delete-from-cart/{id}")
-    public ResponseEntity<CartResponse> deleteSmartphoneFromCart(@PathVariable(name = "id") Long cartItemId,
-                                                                 @AuthenticationPrincipal UserPrincipal user) {
-        return ResponseEntity.status(HttpStatus.OK).body(cartService.deleteSmartphoneFromCart(user.getId(), cartItemId));
+    public ResponseEntity<CartResponse> deleteSmartphoneFromCart(@RequestParam Long userId,
+                                                                 @PathVariable(name = "id") Long cartItemId) {
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.deleteSmartphoneFromCart(userId, cartItemId));
     }
 }
