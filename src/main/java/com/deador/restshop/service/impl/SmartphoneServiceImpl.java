@@ -57,8 +57,8 @@ public class SmartphoneServiceImpl implements SmartphoneService {
     }
 
     @Override
-    public List<SmartphoneResponse> getListOfSmartphoneResponses() {
-        List<SmartphoneResponse> smartphoneResponses = smartphoneRepository.findAll().stream()
+    public List<SmartphoneResponse> getListOfSmartphoneResponses(Pageable pageable) {
+        List<SmartphoneResponse> smartphoneResponses = smartphoneRepository.findAll(pageable).stream()
                 .map(smartphone -> (SmartphoneResponse) dtoConverter.convertToDTO(smartphone, SmartphoneResponse.class))
                 .collect(Collectors.toList());
 

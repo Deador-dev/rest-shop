@@ -32,8 +32,8 @@ public class SmartphoneController {
     }
 
     @GetMapping("/smartphones")
-    public ResponseEntity<List<SmartphoneResponse>> getSmartphones() {
-        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getListOfSmartphoneResponses());
+    public ResponseEntity<List<SmartphoneResponse>> getSmartphones(@PageableDefault(value = SMARTPHONES_PER_PAGE) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(smartphoneService.getListOfSmartphoneResponses(pageable));
     }
 
     @GetMapping("/smartphones/category/{id}")

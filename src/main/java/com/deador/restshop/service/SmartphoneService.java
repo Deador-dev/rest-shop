@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface SmartphoneService {
-    List<SmartphoneResponse> getListOfSmartphoneResponses();
+    List<SmartphoneResponse> getListOfSmartphoneResponses(Pageable pageable);
 
     List<Smartphone> getListOfSmartphonesByCategoryId(Long id);
 
